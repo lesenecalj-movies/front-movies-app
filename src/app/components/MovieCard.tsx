@@ -6,6 +6,7 @@ interface MovieProps {
     id: number;
     title: string;
     poster_path: string;
+    popularity: number;
   };
   lastMovieRef?: (node: HTMLDivElement | null) => void; // Optional ref for infinite scrolling
 }
@@ -20,6 +21,7 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
         height={450}
         className={styles.image}
       />
+      {movie.popularity}  
       <div className={styles.title}>{movie.title}</div>
     </div>
   );
