@@ -7,6 +7,7 @@ type Movie = {
   title: string;
   poster_path: string;
   popularity: number;
+  vote_average: number;
   backdrop_path: string;
 };
 
@@ -18,7 +19,9 @@ export default function GridMovieDisplay({ active }: { active: boolean }) {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    if (active) fetchPopularMovies();
+    if (active) {
+      fetchPopularMovies();
+    }
   }, [active]);
 
   const fetchPopularMovies = useCallback(async () => {
