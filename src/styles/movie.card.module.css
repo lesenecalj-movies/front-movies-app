@@ -17,11 +17,15 @@
   color: white;
   background-color: black;
   border-radius: 0 0 8px 8px;
-  padding: 25px;
+  height: 80px;
+}
+
+.card .imageWrapper {
+  border-radius: 8px;
 }
 
 .card:hover .imageWrapper {
-  border-radius: 8px 8px 0 0;  
+  border-radius: 8px 8px 0 0;
 }
 
 /* ✅ Image Wrapper */
@@ -40,7 +44,72 @@
 }
 
 .movieDetails {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   width: 100%;
-  z-index:999;
+  height: 80px;
+}
+
+.global_info {
+  display: flex;
+  flex: 1;
+}
+
+.runtime_movie {
+  padding: .5em;
+}
+
+.runtime_movie > p {
+  font-size: small;
+}
+
+.circle_container_rated {
+  position: absolute;
+  z-index: 999;
+  display: inline-block; /* Pour que la taille s'adapte au cercle */
+  top: 95%;
+  left: 75%;
+}
+
+.rating_circle {
+  width: 25px; /* Taille du cercle */
+  height: 25px;
+  border-radius: 50%; /* Pour créer un cercle */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.7em;
+  color: black;
+}
+
+.rating_circle_great_movie {
+  border: 1px solid green;
+  background-color: green;
+}
+
+.rating_circle_medium_movie {
+  border: 1px solid orange;
+  background-color: orange;
+}
+
+.rating_circle_bad_movie {
+  border: 1px solid red;
+  background-color: red; /* Optional background */
+}
+
+.providers_info {
+  display: flex;
+  justify-content: flex-end; /* Align items to the right */
+  padding-bottom: .5em;
+  padding-right: .5em;
+}
+
+.provider_logo {
+  border-radius: 4px;
+  object-fit: cover;
+  width: 30px;
+  height: 30px;
+  padding: 5px;
 }
