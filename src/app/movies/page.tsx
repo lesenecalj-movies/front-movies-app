@@ -10,8 +10,11 @@ export default function Movies() {
 
   return (
     <div className={styles.container}>
-      <main>
+      <header className={styles.container_movies_title}>
         <h1>Movies 🎬</h1>
+      </header>
+
+      <section className={styles.container_movies_filters}>
         <div className={styles.display}>
           <button onClick={() => setViewMode("grid")}>
             <Image src="/icons/grid.png" alt="Grille" width={24} height={24} />
@@ -25,8 +28,15 @@ export default function Movies() {
             />
           </button>
         </div>
-        {viewMode === "grid" && <MovieGridDisplay active={viewMode === "grid"} />}
-        {viewMode === "categories" && <CategoriesMovieDisplay active={viewMode === "categories"} />}
+      </section>
+
+      <main className={styles.container_movies_display}>
+        {viewMode === "grid" && (
+          <MovieGridDisplay active={viewMode === "grid"} />
+        )}
+        {viewMode === "categories" && (
+          <CategoriesMovieDisplay active={viewMode === "categories"} />
+        )}
       </main>
     </div>
   );

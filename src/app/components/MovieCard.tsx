@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 type MovieDetails = {
   runtime: number;
+  genres: [{ id: number; name: string }];
 };
 
 type MovieProvider = {
@@ -87,7 +88,7 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
         data.results && data.results["CA"] && data.results["CA"].flatrate
           ? data.results["CA"].flatrate
           : [];
-      if (!flatrates) {
+      if (flatrates) {
         setMovieProviders(getParentProviders(flatrates));
       }
     } catch (error) {
@@ -120,14 +121,18 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-
-      {movie.vote_average && parseInt(movie.vote_average.toString(), 10) > 0 && (
-        <div className={styles.circle_container_rated}>
-          <div className={`${styles.rating_circle} ${themeMovie ? styles[`rating_circle_${themeMovie}`] : ''}`}>
-            <span className={styles.vote_average}>{formattedRateMovie}</span>
+      {movie.vote_average &&
+        parseInt(movie.vote_average.toString(), 10) > 0 && (
+          <div className={styles.circle_container_rated}>
+            <div
+              className={`${styles.rating_circle} ${
+                themeMovie ? styles[`rating_circle_${themeMovie}`] : ""
+              }`}
+            >
+              <span className={styles.vote_average}>{formattedRateMovie}</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       <div className={styles.imageWrapper}>
         <Image
@@ -141,31 +146,41 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
 
       {isHovered && (
         <div className={styles.movieDetails}>
-          <div className={styles.global_info}>
-            <p className={styles.runtime_movie}>
-              {movieDetails?.runtime ? `${movieDetails.runtime} min` : "N/A"}
-            </p>
+          <div className={styles.genres_movie}>
+            {movieDetails?.genres.map((genre, index) => (
+              <span className={styles.genre} key={index}>
+                {genre.name}
+                {index < movieDetails.genres.length - 1 && (
+                  <span className={styles.separator}>•</span>
+                )}
+              </span>
+            ))}
           </div>
-          <div className={styles.providers_info}>
-            {movieProviders?.map(
-              (
-                movieProvider: { name: string; logoPath: string },
-                index: number
-              ) => (
-                <div
-                  className="provider"
-                  key={`${index}_provider_${movie.id}_movie`}
-                >
-                  <Image
-                    src={`https://image.tmdb.org/t/p/original/${movieProvider.logoPath}`}
-                    alt={movieProvider.name}
-                    className={styles.provider_logo}
-                    width="30"
-                    height="30"
-                  />
-                </div>
-              )
-            )}
+          <div className={styles.extra_details}>
+            <div className={styles.runtime_movie}>
+              {movieDetails?.runtime ? `${movieDetails.runtime} min` : "N/A"}
+            </div>
+            <div className={styles.providers_info}>
+              {movieProviders?.map(
+                (
+                  movieProvider: { name: string; logoPath: string },
+                  index: number
+                ) => (
+                  <div
+                    className="provider"
+                    key={`${index}_provider_${movie.id}_movie`}
+                  >
+                    <Image
+                      src={`https://image.tmdb.org/t/p/original/${movieProvider.logoPath}`}
+                      alt={movieProvider.name}
+                      className={styles.provider_logo}
+                      width="30"
+                      height="30"
+                    />
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -1,13 +1,34 @@
+
 .container {
-  min-height: 100vh;
-  color: black;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.container_movies_title {
+  padding: 1rem;
+  background-color: white;
+  border-bottom: 1px solid #ccc;
+}
+
+.container_movies_filters {
+  padding: 1rem;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ddd;
+}
+
+.container_movies_display {
+  width: 90%;
+  align-self: center;
+  padding: 1rem;
+  background-color: #fafafa;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  place-items: center;
+  gap: 2.5rem;
   height: auto;
   overflow: visible; /* Allows the card to grow outside its box */
 }
