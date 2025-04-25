@@ -9,9 +9,10 @@ type Movie = {
   popularity: number;
   vote_average: number;
   backdrop_path: string;
+  genre_ids: number[];
 };
 
-export default function GridMovieDisplay({ active }: { active: boolean }) {
+export default function GridMovieDisplay({ active, genres }: { active: boolean, genres: number[] }) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setNextPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -19,20 +20,27 @@ export default function GridMovieDisplay({ active }: { active: boolean }) {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    if (active) {
-      fetchPopularMovies();
-    }
-  }, [active]);
+    if (!active) return;
+    setMovies([]);
+    setHasMore(true);
+    setNextPage(1);
+  }, [genres, active]);
 
-  const fetchPopularMovies = useCallback(async () => {
+  useEffect(() => {
+    if (!active) return;
+      fetchPopularMovies(genres, page);
+  }, [page, genres, active]);
+
+  const fetchPopularMovies = useCallback(async (genres: number[], page: number) => {
     if (loading || !hasMore) {
       return;
     }
     setLoading(true);
 
+    const g = genres && genres.length > 0 ? genres : [];
     try {
       const res = await fetch(
-        `http://localhost:3001/movies/popular?page=${page}`
+        `http://localhost:3001/movies/discover?page=${page}&genres=${g}`
       );
       if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
       const data: {
@@ -41,6 +49,7 @@ export default function GridMovieDisplay({ active }: { active: boolean }) {
         total_pages: number;
         total_results: number;
       } = await res.json();
+
       setMovies((prevMovies) => {
         const movieSet = new Set(prevMovies.map((m) => m.id));
         const newMovies = data.results.filter(
@@ -48,14 +57,14 @@ export default function GridMovieDisplay({ active }: { active: boolean }) {
         );
         return [...prevMovies, ...newMovies];
       });
-      setNextPage(page + 1);
+      // setNextPage(page + 1);
       setHasMore(data.results.length > 0);
     } catch (error) {
       console.error("Error fetching popular movies:", error);
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, page]);
+  }, [loading, hasMore]);
 
   const lastMovieRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -66,7 +75,7 @@ export default function GridMovieDisplay({ active }: { active: boolean }) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting) {
-            fetchPopularMovies();
+            // fetchPopularMovies();
           }
         },
         { rootMargin: "100px" }
