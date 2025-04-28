@@ -1,29 +1,11 @@
 import Image from "next/image";
 import styles from "../../styles/movie.card.module.css";
 import { useCallback, useEffect, useState } from "react";
-
-type MovieDetails = {
-  runtime: number;
-  genres: [{ id: number; name: string }];
-};
-
-type MovieProvider = {
-  display_priority: number;
-  logo_path: string;
-  provider_id: number;
-  provider_name: string;
-};
-
-interface MovieProps {
-  movie: {
-    id: number;
-    title: string;
-    poster_path: string;
-    popularity: number;
-    vote_average: number;
-  };
-  lastMovieRef?: (node: HTMLDivElement | null) => void; // Optional ref for infinite scrolling
-}
+import {
+  MovieDetails,
+  MovieProps,
+  MovieProvider,
+} from "./interfaces/movie.types";
 
 export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -121,18 +103,17 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {movie.vote_average &&
-        parseInt(movie.vote_average.toString(), 10) > 0 && (
-          <div className={styles.circle_container_rated}>
-            <div
-              className={`${styles.rating_circle} ${
-                themeMovie ? styles[`rating_circle_${themeMovie}`] : ""
-              }`}
-            >
-              <span className={styles.vote_average}>{formattedRateMovie}</span>
-            </div>
+      {formattedRateMovie && Number(formattedRateMovie) > 0 && (
+        <div className={styles.circle_container_rated}>
+          <div
+            className={`${styles.rating_circle} ${
+              themeMovie ? styles[`rating_circle_${themeMovie}`] : ""
+            }`}
+          >
+            <span className={styles.vote_average}>{formattedRateMovie}</span>
           </div>
-        )}
+        </div>
+      )}
 
       <div className={styles.imageWrapper}>
         <Image
