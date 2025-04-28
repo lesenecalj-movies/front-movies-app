@@ -4,6 +4,7 @@
   width: 175px;
   transition: transform 0.3s ease-in-out;
   cursor: pointer;
+  z-index: 1;
 }
 
 .card:hover {
@@ -20,12 +21,9 @@
   height: 80px;
 }
 
-.card .imageWrapper {
-  border-radius: 8px;
-}
-
 .card:hover .imageWrapper {
   border-radius: 8px 8px 0 0;
+  border: 2px solid black;
 }
 
 /* ✅ Image Wrapper */
@@ -51,30 +49,51 @@
   height: 80px;
 }
 
-.global_info {
+.runtime_movie {
+  font-size: x-small;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.genres_movie {
   display: flex;
   flex: 1;
+  flex-wrap: wrap;
+  padding: .8rem .5rem .5rem .5rem;
+  font-size: x-small;
 }
 
-.runtime_movie {
-  padding: .5em;
+.separator {
+  margin: 0 4px;
+  color: gray;
 }
 
-.runtime_movie > p {
-  font-size: small;
+.extra_details {
+  display: flex;
+  flex: 1;
+  padding: 0 .5rem;
 }
 
 .circle_container_rated {
   position: absolute;
-  z-index: 999;
+  z-index: 2;
+  display: inline-block; /* Pour que la taille s'adapte au cercle */
+  top: 95%;
+  left: 75%;
+}
+
+.card:hover .circle_container_rated {
+  position: absolute;
+  z-index: 12;
   display: inline-block; /* Pour que la taille s'adapte au cercle */
   top: 95%;
   left: 75%;
 }
 
 .rating_circle {
-  width: 25px; /* Taille du cercle */
-  height: 25px;
+  width: 20px; /* Taille du cercle */
+  height: 20px;
   border-radius: 50%; /* Pour créer un cercle */
   display: flex;
   justify-content: center;
@@ -101,9 +120,8 @@
 
 .providers_info {
   display: flex;
+  flex: 1;
   justify-content: flex-end; /* Align items to the right */
-  padding-bottom: .5em;
-  padding-right: .5em;
 }
 
 .provider_logo {

@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../styles/movies.module.css";
 import MovieCard from "./MovieCard";
-
-type Movie = {
-  id: number;
-  title: string;
-  poster_path: string;
-  popularity: number;
-};
+import { Movie } from "./interfaces/movie.types";
 
 export default function CategoriesMovieDisplay({ active }: { active: boolean }) {
   const [discoverMovies, setDiscoverMovies] = useState<Movie[]>([]);
