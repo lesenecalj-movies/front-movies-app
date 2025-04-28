@@ -116,13 +116,17 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
       )}
 
       <div className={styles.imageWrapper}>
-        <Image
-          src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-          alt={movie.title}
-          fill
-          className={styles.image}
-          priority
-        />
+        {movie.poster_path ? (
+          <Image
+            src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
+            alt={movie.title}
+            fill
+            className={styles.image}
+            priority
+          />
+        ) : (
+          <>{/* todo: handle the case where there isn't image. */}</>
+        )}
       </div>
 
       {isHovered && (
