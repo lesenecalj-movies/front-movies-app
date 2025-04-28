@@ -31,5 +31,6 @@ export type Categorie = {
 export interface MovieFiltersProps {
   genres: number[];
   toggleGenre: (id: number) => void;
-  toggleViewMode: (viewMode: string) => void;
+  rate: number;
+  toggleRate: (rate: number) => void;
 }

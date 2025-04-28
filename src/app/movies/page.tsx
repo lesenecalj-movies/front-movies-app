@@ -2,24 +2,11 @@
 import styles from "../../styles/movies.module.css";
 import MovieGridDisplay from "../components/GridMovieDisplay";
 import CategoriesMovieDisplay from "../components/CategoriesMovieDisplay";
+import Image from "next/image";
 import { useState } from "react";
-import MovieFilters from "../components/MovieFilters";
 
 export default function Movies() {
   const [viewMode, setViewMode] = useState<"grid" | "categories">("grid");
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
-
-  const toggleViewMode = (vm: string) => {
-    setViewMode(vm === "grid" ? "categories" : "grid");
-  };
-
-  const toggleGenre = (id: number) => {
-    setSelectedGenres((prev) =>
-      prev.includes(id)
-        ? prev.filter((genreId) => genreId !== id)
-        : [...prev, id]
-    );
-  };
 
   return (
     <div className={styles.container}>
@@ -27,18 +14,23 @@ export default function Movies() {
         <h1>Movies 🎬</h1>
       </header>
 
-      <MovieFilters
-        genres={selectedGenres}
-        toggleGenre={toggleGenre}
-        toggleViewMode={toggleViewMode}
-      />
-
       <main className={styles.container_movies_display}>
+        <div className={styles.display}>
+          <button onClick={() => setViewMode("grid")}>
+            <Image src="/icons/grid.png" alt="Grille" width={24} height={24} />
+          </button>
+          <button onClick={() => setViewMode("categories")}>
+            <Image
+              src="/icons/menu.png"
+              alt="Catégories"
+              width={24}
+              height={24}
+            />
+          </button>
+        </div>
+
         {viewMode === "grid" && (
-          <MovieGridDisplay
-            active={viewMode === "grid"}
-            genres={selectedGenres}
-          />
+          <MovieGridDisplay active={viewMode === "grid"} />
         )}
         {viewMode === "categories" && (
           <CategoriesMovieDisplay active={viewMode === "categories"} />

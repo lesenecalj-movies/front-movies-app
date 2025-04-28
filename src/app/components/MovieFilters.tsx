@@ -1,13 +1,12 @@
 import Typography from "@mui/material/Typography";
 import { Chip, styled } from "@mui/material";
-import Image from "next/image";
 import Slider from "@mui/material/Slider";
 import { useEffect, useState } from "react";
-import styles from "../../styles/movies.module.css";
+import styles from "../../styles/movie.filter.module.css";
 import { Categorie, MovieFiltersProps } from "./interfaces/movie.types";
 
 export default function MovieFilters(props: MovieFiltersProps) {
-  const {genres, toggleGenre, toggleViewMode} = props;
+  const { genres, toggleGenre, rate, toggleRate } = props;
   const [categories, setCategories] = useState<Categorie[]>([]);
 
   useEffect(() => {
@@ -79,7 +78,8 @@ export default function MovieFilters(props: MovieFiltersProps) {
             <PrettoSlider
               valueLabelDisplay="auto"
               aria-label="pretto slider"
-              defaultValue={20}
+              defaultValue={rate}
+              onChange={(event, newValue) => toggleRate(newValue as number)}
             />
           </div>
         </div>
@@ -100,19 +100,6 @@ export default function MovieFilters(props: MovieFiltersProps) {
             );
           })}
         </div>
-      </div>
-      <div className={styles.display}>
-        <button onClick={() => toggleViewMode("grid")}>
-          <Image src="/icons/grid.png" alt="Grille" width={24} height={24} />
-        </button>
-        <button onClick={() => toggleViewMode("categories")}>
-          <Image
-            src="/icons/menu.png"
-            alt="Catégories"
-            width={24}
-            height={24}
-          />
-        </button>
       </div>
     </section>
   );
