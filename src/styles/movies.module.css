@@ -11,36 +11,6 @@
   border-bottom: 1px solid #ccc;
 }
 
-.container_movies_filters {
-  padding: 1rem;
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #ddd;
-}
-
-.movies_filters {
-  display: flex;
-  align-items: center;
-}
-
-.container_filter_rate {
-  flex: 1;
-}
-
-.slider_rate {
-  padding: 2rem;
-  width: 75%;
-}
-
-.container_filters_genre {
-  flex: 2;
-  padding: 2rem;
-}
-
-.genre_chip {
-  background-color: black;
-  color: white;
-}
-
 .container_movies_display {
   width: 90%;
   align-self: center;
