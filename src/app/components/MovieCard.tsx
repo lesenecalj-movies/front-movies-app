@@ -1,5 +1,5 @@
 import Image from "next/image";
-import styles from "../../styles/movie.card.module.css";
+import styles from "../../styles/movie.card.module.scss";
 import { useCallback, useEffect, useState } from "react";
 import {
   MovieDetails,

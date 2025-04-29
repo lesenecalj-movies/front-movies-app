@@ -1,0 +1,129 @@
+/* ✅ Movie Card */
+.card {
+  position: relative;
+  width: 175px;
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+  z-index: 1;
+  &:hover {
+    position: relative;
+    transform: scale(1.3);
+    z-index: 10;
+    cursor: pointer;
+
+    .imageWrapper {
+      border-radius: 8px 8px 0 0;
+      border: 2px solid black;
+    }
+  }
+
+  .imageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 8px;
+  
+    .image {
+      object-fit: cover;
+      transition: transform 0.3s ease-in-out;
+    }
+  }
+}
+
+.card .movieDetails {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: black;
+  color: white;
+  border-radius: 0 0 8px 8px;
+  height: 80px;
+  width: 100%;
+
+  .runtime_movie {
+    font-size: x-small;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .genres_movie {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    padding: .8rem .5rem .5rem .5rem;
+    font-size: x-small;
+  }
+
+  .separator {
+    margin: 0 4px;
+    color: gray;
+  }
+
+  .extra_details {
+    display: flex;
+    flex: 1;
+    padding: 0 .5rem;
+
+    .providers_info {
+      display: flex;
+      flex: 1;
+      justify-content: flex-end; /* Align items to the right */
+    }
+    
+    .provider_logo {
+      border-radius: 4px;
+      object-fit: cover;
+      width: 30px;
+      height: 30px;
+      padding: 5px;
+    }
+  }
+}
+
+
+.card {
+  &:hover .circle_container_rated {
+    position: absolute;
+    z-index: 12;
+    display: inline-block; /* Pour que la taille s'adapte au cercle */
+    top: 95%;
+    left: 75%;
+  }
+
+  .circle_container_rated {
+    position: absolute;
+    z-index: 2;
+    display: inline-block; /* Pour que la taille s'adapte au cercle */
+    top: 95%;
+    left: 75%;
+  }
+
+  .rating_circle {
+    width: 20px; /* Taille du cercle */
+    height: 20px;
+    border-radius: 50%; /* Pour créer un cercle */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.7em;
+    color: black;
+  }
+  
+  .rating_circle_great_movie {
+    border: 1px solid green;
+    background-color: green;
+  }
+  
+  .rating_circle_medium_movie {
+    border: 1px solid orange;
+    background-color: orange;
+  }
+  
+  .rating_circle_bad_movie {
+    border: 1px solid red;
+    background-color: red; /* Optional background */
+  }  
+}
