@@ -1,5 +1,5 @@
 "use client";
-import styles from "../../styles/movies.module.css";
+import styles from "../../styles/movies.module.scss";
 import MovieGridDisplay from "../components/GridMovieDisplay";
 import CategoriesMovieDisplay from "../components/CategoriesMovieDisplay";
 import Image from "next/image";

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import styles from "../../styles/movies.module.css";
+import styles from "../../styles/movies.module.scss";
 import MovieCard from "./MovieCard";
 import { Movie } from "./interfaces/movie.types";
 

@@ -1,3 +1,8 @@
+export type Categorie = {
+  id: number;
+  name: string;
+};
+
 export type Movie = {
   id: number;
   title: string;
@@ -22,11 +27,6 @@ export interface MovieProps {
   movie: Movie;
   lastMovieRef?: (node: HTMLDivElement | null) => void; // Optional ref for infinite scrolling
 }
-
-export type Categorie = {
-  id: number;
-  name: string;
-};
 
 export interface MovieFiltersProps {
   genres: number[];

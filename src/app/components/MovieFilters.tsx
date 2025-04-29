@@ -2,7 +2,7 @@ import Typography from "@mui/material/Typography";
 import { Chip, styled } from "@mui/material";
 import Slider from "@mui/material/Slider";
 import { useEffect, useState } from "react";
-import styles from "../../styles/movie.filter.module.css";
+import styles from "../../styles/movie.filter.module.scss";
 import { Categorie, MovieFiltersProps } from "./interfaces/movie.types";
 
 export default function MovieFilters(props: MovieFiltersProps) {

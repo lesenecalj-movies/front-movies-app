@@ -1,0 +1,43 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  .container_movies_title {
+    padding: 1rem;
+    background-color: white;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .container_movies_display {
+    width: 90%;
+    align-self: center;
+    padding: 1rem;
+    background-color: #fafafa;
+  }
+}
+
+.display {
+  display: flex;
+  justify-content: end;
+  > button {
+    padding: .5em;
+    align-items: center;
+    background: white !important;
+    border: 1px solid #fff;
+    display: flex;
+    border-color: black;
+    .active {
+      background: white;
+    }
+    &:hover {
+      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
