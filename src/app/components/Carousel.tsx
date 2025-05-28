@@ -1,50 +1,68 @@
-// NetflixCarousel.tsx
-import React, { useState } from "react";
-import "../../styles/movie.carousel.module.css";
+import React, { useRef } from "react";
+import styles from "../../styles/movie.carousel.module.scss";
 import { Movie } from "./interfaces/movie.types";
-
 
 interface NetflixCarouselProps {
   movies: Movie[];
-  itemsPerPage?: number;
+  itemWidth?: number;
+  gap?: number;
 }
 
-const NetflixCarousel: React.FC<NetflixCarouselProps> = ({ movies, itemsPerPage = 10 }) => {
-  const [page, setPage] = useState(0);
-  const totalPages = Math.ceil(movies.length / itemsPerPage);
+const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
+  movies,
+  itemWidth = 210,
+  gap = 10,
+}) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 0));
-  const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages - 1));
+  const handleScroll = (direction: "left" | "right") => {
+    const container = containerRef.current;
+    if (!container) return;
 
-  const startIndex = page * itemsPerPage;
+    const scrollAmount = (itemWidth + gap) * 5; // scroll by 2 items at a time
+    container.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
 
   return (
-    <div className="carousel-container">
+    <div className={styles.carousel_container}>
       <button
-        className="carousel-button left"
-        onClick={handlePrev}
-        disabled={page === 0}
+        className={`${styles.carousel_button} ${styles.left}`}
+        onClick={() => handleScroll("left")}
       >
         ◀
       </button>
 
-      <div className="carousel-wrapper">
-        <div
-          className="carousel-track"
-          style={{ transform: `translateX(-${startIndex * 210}px)` }} // 200px + margin
-        >
-          {movies.map((movie) => (
-            <div className="carousel-item" key={movie.id}>
-              <img src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`} alt={movie.title} />
-            </div>
-          ))}
-        </div>
+      <div
+        className={styles.carousel_wrapper}
+        ref={containerRef}
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          scrollBehavior: "smooth",
+          gap: `${gap}px`,
+        }}
+      >
+        {movies.map((movie) => (
+          <div
+            key={movie.id}
+            className={styles.carousel_item}
+            style={{ minWidth: `${itemWidth}px`, flexShrink: 0 }}
+          >
+            <img
+              src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
+              alt={movie.title}
+              style={{ width: "100%" }}
+            />
+          </div>
+        ))}
       </div>
 
       <button
-        className="carousel-button right"
-        onClick={handleNext}
-        disabled={page >= totalPages - 1}
+        className={`${styles.carousel_button} ${styles.right}`}
+        onClick={() => handleScroll("right")}
       >
         ▶
       </button>

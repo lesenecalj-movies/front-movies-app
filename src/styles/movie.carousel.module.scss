@@ -2,3 +2,65 @@
 .slick-next:before {
   color: black !important;
 }
+
+.carousel_container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+}
+
+.carousel_button {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 2;
+
+  &.left {
+    position: absolute;
+    left: 0;
+  }
+
+  &.right {
+    position: absolute;
+    right: 0;
+  }
+}
+
+.carousel_wrapper {
+  overflow: hidden;
+  width: 100%;
+  display: "flex";
+  overflow-x: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel_track {
+  display: flex;
+  transition: transform 0.4s ease;
+  gap: 10px;
+}
+
+.carousel_item {
+  flex: 0 0 180px;
+  height: 300px;
+  background-color: #222;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
