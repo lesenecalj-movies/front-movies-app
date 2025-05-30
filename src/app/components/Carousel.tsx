@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import styles from "../../styles/movie.carousel.module.scss";
 import { Movie } from "./interfaces/movie.types";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface NetflixCarouselProps {
   movies: Movie[];
@@ -14,13 +15,34 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
   gap = 5,
 }) => {
 
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScroll = (direction: "left" | "right") => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const visibleItems = Math.floor(container.offsetWidth / (itemWidth + gap));
+    const scrollAmount = visibleItems * (itemWidth + gap);
+
+    container.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div className={styles.carousel_container}>
+      <button
+        className={`${styles.carousel_button} ${styles.left}`}
+        onClick={() => handleScroll("left")}
+      >
+        <ChevronLeft size={32} />
+      </button>
+
       <div
+        ref={carouselRef}
         className={styles.carousel_wrapper}
-        style={{
-          gap: `${gap}px`,
-        }}
+        style={{ gap: `${gap}px` }}
       >
         {movies.map((movie) => (
           <div
@@ -41,6 +63,14 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
           </div>
         ))}
       </div>
+
+      <button
+        className={`${styles.carousel_button} ${styles.right}`}
+        onClick={() => handleScroll("right")}
+      >
+        <ChevronRight size={32} />
+      </button>
+
     </div>
   );
 };
