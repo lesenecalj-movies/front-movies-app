@@ -1,206 +1,172 @@
-import React, { useEffect, useRef, useState } from "react";
-import styles from "../../styles/movie.carousel.module.scss";
-import { Movie } from "./interfaces/movie.types";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import MoviePreview from "./moviePreview";
+import React, { useRef, useEffect, useState } from "react";
 
-interface NetflixCarouselProps {
-  movies: Movie[];
-  itemWidth?: number;
-  gap?: number;
+interface Movie {
+  id: number;
+  title: string;
+  poster_path: string;
 }
 
-const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
-  movies,
-  itemWidth = 199,
-  gap = 10,
-}) => {
-  const [fullyVisibleIds, setFullyVisibleIds] = useState<Set<number>>(
-    new Set()
-  );
+interface Props {
+  movies: Movie[];
+}
 
-  const [containerWidth, setContainerWidth] = useState<number | null>(null);
-  const [visibleItemCount, setVisibleItemCount] = useState(5);
-  const [hoveredMovie, setHoveredMovie] = useState<Movie | null>(null);
-  const [previewPosition, setPreviewPosition] = useState<{
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  } | null>(null);
-
-  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
+const NetflixCarousel = ({ movies }: Props) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const observer = useRef<IntersectionObserver | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const setItemRef = (id: number) => (el: HTMLDivElement | null) => {
-    if (el) {
-      itemRefs.current.set(id, el);
-    } else {
-      itemRefs.current.delete(id);
-    }
+  // Function to update itemsPerPage based on container width
+  const updateItemsPerPage = () => {
+    if (!containerRef.current) return;
+    const width = containerRef.current.offsetWidth;
+    console.log({ width });
+    if (width < 600) setItemsPerPage(1);
+    else if (width < 900) setItemsPerPage(2);
+    else if (width < 1200) setItemsPerPage(3);
+    else if (width < 1500) setItemsPerPage(4);
+    else setItemsPerPage(5);
+    console.log({ itemsPerPage });
   };
 
   useEffect(() => {
-    if (observer.current) {
-      observer.current.disconnect();
-    }
+    updateItemsPerPage(); // initial check
 
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        const visible = new Set(fullyVisibleIds); // clone previous visible set
-
-        entries.forEach((entry) => {
-          const target = entry.target as HTMLElement;
-          const id = Number(target.dataset.id);
-
-          if (entry.intersectionRatio >= 1) {
-            visible.add(id);
-          } else {
-            visible.delete(id);
-          }
-        });
-
-        setFullyVisibleIds(visible);
-      },
-      {
-        root: containerRef.current,
-        threshold: 1.0,
-      }
-    );
-
-    itemRefs.current.forEach((el) => observer.current?.observe(el));
-
-    return () => observer.current?.disconnect();
-  }, [movies, fullyVisibleIds]);
-
-  useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
+    // ResizeObserver on containerRef
     const resizeObserver = new ResizeObserver(() => {
-      const containerWidth = container.offsetWidth;
-      const totalItemWidth = itemWidth + gap;
-
-      const count = Math.floor((containerWidth + gap) / totalItemWidth);
-      const adjustedWidth = count * totalItemWidth - gap;
-
-      setVisibleItemCount(count);
-      setContainerWidth(adjustedWidth);
-
-      itemRefs.current.forEach((el) => {
-        observer.current?.unobserve(el);
-        observer.current?.observe(el);
-      });
+      updateItemsPerPage();
     });
-
     resizeObserver.observe(container);
+
+    // Fallback window resize event listener
+    window.addEventListener("resize", updateItemsPerPage);
 
     return () => {
       resizeObserver.disconnect();
+      window.removeEventListener("resize", updateItemsPerPage);
     };
-  }, [itemWidth, gap]);
+  }, []);
 
-  const handleScroll = (direction: "left" | "right") => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
-    const scrollAmount = visibleItemCount * (itemWidth + gap);
-    wrapper.scrollBy({
-      left: direction === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth",
-    });
-  };
-
-  const handleMouseEnter = (movie: Movie, e: React.MouseEvent) => {
-    if (!fullyVisibleIds.has(movie.id)) {
-      return;
-    }
-
-    if (movie !== hoveredMovie) {
-      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-      setHoveredMovie(movie);
-      setPreviewPosition({
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
+  const scrollToIndex = (index: number) => {
+    const targetItem = itemRefs.current[index];
+    if (targetItem && scrollRef.current) {
+      scrollRef.current.scrollTo({
+        left: targetItem.offsetLeft,
+        behavior: "smooth",
       });
+      setCurrentIndex(index);
     }
   };
 
-  const handleMouseLeave = (movie: Movie) => {
-    if (movie !== hoveredMovie) {
-      setHoveredMovie(null);
-      setPreviewPosition(null);
-    }
+  const handlePrev = () => {
+    const newIndex = Math.max(0, currentIndex - itemsPerPage);
+    scrollToIndex(newIndex);
+  };
+
+  const handleNext = () => {
+    const maxIndex = movies.length - itemsPerPage;
+    const newIndex = Math.min(currentIndex + itemsPerPage, maxIndex);
+    scrollToIndex(newIndex);
+  };
+
+  const itemStyle = {
+    flex: `0 0 ${100 / itemsPerPage}%`,
+    scrollSnapAlign: "start",
+    padding: "0 0.5rem",
+    boxSizing: "border-box" as const,
   };
 
   return (
-    <div className={styles.carousel_container} ref={containerRef}>
-      <div className={styles.container_carousel_buton}>
-        <button
-          className={`${styles.carousel_button} ${styles.left}`}
-          onClick={() => handleScroll("left")}
-        >
-          <ChevronLeft size={32} />
-        </button>
-      </div>
-
-      <div
-        className={styles.carousel_wrapper}
-        ref={wrapperRef}
+    <div ref={containerRef} style={{ padding: "1rem", width: '100%' }}>
+      <h2
         style={{
-          gap: `${gap}px`,
-          width: containerWidth ? `${containerWidth}px` : "100%",
-          overflow: "hidden",
-          display: "flex",
+          fontSize: "1.5rem",
+          fontWeight: "bold",
+          marginBottom: "0.5rem",
         }}
       >
-        {(movies).map((movie) => (
-          <div
-            key={movie.id}
-            data-id={movie.id}
-            className={styles.carousel_item}
-            ref={setItemRef(movie.id)}
-            onMouseEnter={(e) => handleMouseEnter(movie, e)}
-            onMouseLeave={() => handleMouseLeave(movie)}
-            style={{ minWidth: `${itemWidth}px`, flexShrink: 0 }}
-          >
-            <img
-              src={`https://image.tmdb.org/t/p/w300/${movie.poster_path}`}
-              alt={movie.title}
-              className={styles.movie_poster}
-            />
-          </div>
-        ))}
-      </div>
+        Popular Movies
+      </h2>
 
-      <div className={styles.container_carousel_buton}>
-        <button
-          className={`${styles.carousel_button} ${styles.right}`}
-          onClick={() => handleScroll("right")}
-        >
-          <ChevronRight size={32} />
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <button onClick={handlePrev} style={navButtonStyle("left")}>
+          &#8249;
         </button>
-      </div>
 
-      {hoveredMovie && previewPosition && (
         <div
-          className={styles.preview_container}
+          ref={scrollRef}
           style={{
-            position: "absolute",
-            top: `${previewPosition.top + window.scrollY - 150}px`,
-            left: `${previewPosition.left + previewPosition.width / 2}px`,
-            transform: "translateX(-50%)",
-            zIndex: 10,
+            display: "flex",
+            overflowX: "hidden",
+            scrollSnapType: "x mandatory",
+            scrollBehavior: "smooth",
+            width: "100%",
+            flexShrink: 1,
+            minWidth: 0,
           }}
         >
-          <MoviePreview movie={hoveredMovie} onClose={handleMouseLeave} />
+          {movies.map((movie, index) => (
+            <div
+              key={movie.id}
+              ref={(el) => (itemRefs.current[index] = el)}
+              style={itemStyle}
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w300/${movie.poster_path}`}
+                alt={movie.title}
+                style={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                }}
+              />
+              <p
+                style={{
+                  marginTop: "0.5rem",
+                  textAlign: "center",
+                  fontSize: "0.9rem",
+                  fontWeight: "500",
+                }}
+              >
+                {movie.title}
+              </p>
+            </div>
+          ))}
         </div>
-      )}
+
+        <button onClick={handleNext} style={navButtonStyle("right")}>
+          &#8250;
+        </button>
+      </div>
     </div>
   );
 };
+
+const navButtonStyle = (side: "left" | "right") => ({
+  position: "absolute" as const,
+  [side]: 0,
+  zIndex: 1,
+  top: "50%",
+  transform: "translateY(-50%)",
+  backgroundColor: "rgba(0,0,0,0.6)",
+  color: "#fff",
+  border: "none",
+  borderRadius: "50%",
+  fontSize: "1.5rem",
+  width: "2.5rem",
+  height: "2.5rem",
+  cursor: "pointer",
+});
 
 export default NetflixCarousel;
