@@ -1,9 +1,9 @@
 "use client";
 import styles from "../../styles/movies.module.scss";
-import MovieGridDisplay from "../components/GridMovieDisplay";
-import CategoriesMovieDisplay from "../components/CategoriesMovieDisplay";
+import GridMovies from "../components/GridMovies";
 import Image from "next/image";
 import { useState } from "react";
+import CategoriesMovies from "../components/CategoriesMovies";
 
 export default function Movies() {
   const [viewMode, setViewMode] = useState<"grid" | "categories">("grid");
@@ -30,10 +30,10 @@ export default function Movies() {
         </div>
 
         {viewMode === "grid" && (
-          <MovieGridDisplay active={viewMode === "grid"} />
+          <GridMovies active={viewMode === "grid"} />
         )}
         {viewMode === "categories" && (
-          <CategoriesMovieDisplay active={viewMode === "categories"} />
+          <CategoriesMovies active={viewMode === "categories"} />
         )}
       </main>
     </div>

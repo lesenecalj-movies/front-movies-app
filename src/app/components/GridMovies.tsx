@@ -13,7 +13,7 @@ type Movie = {
   genre_ids: number[];
 };
 
-export default function GridMovieDisplay({ active }: { active: boolean }) {
+export default function GridMovies({ active }: { active: boolean }) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setNextPage] = useState(1);
   const [loading, setLoading] = useState(false);

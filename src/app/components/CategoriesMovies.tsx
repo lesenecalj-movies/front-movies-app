@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import styles from "../../styles/movies.module.scss";
-import MovieCard from "./MovieCard";
+import styles from "../../styles/movie.categories.module.scss";
 import { Movie } from "./interfaces/movie.types";
+import NetflixCarousel from "./Carousel";
 
-export default function CategoriesMovieDisplay({ active }: { active: boolean }) {
+export default function CategoriesMovies({ active }: { active: boolean }) {
   const [discoverMovies, setDiscoverMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
     fetchDiscoverMovies();
   }, [active]);
+
 
   const fetchDiscoverMovies = useCallback(async () => {
     try {
@@ -32,13 +33,8 @@ export default function CategoriesMovieDisplay({ active }: { active: boolean }) 
   }, []);
 
   return (
-    <div className={styles.grid}>
-    {discoverMovies.map((movie: Movie) => (
-      <MovieCard
-        key={movie.id}
-        movie={movie}
-      />
-    ))}
-  </div>
-  )
-};
+    <div className={styles.container_categories_movies}>
+      <NetflixCarousel movies={discoverMovies} />
+    </div>
+  );
+}
