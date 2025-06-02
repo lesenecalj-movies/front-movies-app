@@ -1,0 +1,13 @@
+.preview {
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .info {
+    padding: 1rem;
+    color: white;
+  }
+}
