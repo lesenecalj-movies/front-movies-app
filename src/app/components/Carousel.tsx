@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 
 interface Movie {
   id: number;
@@ -17,7 +23,7 @@ const NetflixCarousel = ({ movies }: Props) => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const updateItemsPerPage = () => {
+  const updateItemsPerPage = useCallback(() => {
     if (!containerRef.current) return;
     const width = containerRef.current.offsetWidth;
     if (width < 576) setItemsPerPage(1); // xs
@@ -26,6 +32,14 @@ const NetflixCarousel = ({ movies }: Props) => {
     else if (width < 1200) setItemsPerPage(4); // lg
     else if (width < 1400) setItemsPerPage(5); // xl
     else setItemsPerPage(6);
+  }, []);
+
+  const debounce = (fn: () => void, delay: number) => {
+    let timeout: ReturnType<typeof setTimeout>;
+    return () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(fn, delay);
+    };
   };
 
   useEffect(() => {
@@ -39,15 +53,16 @@ const NetflixCarousel = ({ movies }: Props) => {
     });
     resizeObserver.observe(container);
 
-    window.addEventListener("resize", updateItemsPerPage);
+    const debouncedResize = debounce(updateItemsPerPage, 100);
+    window.addEventListener("resize", debouncedResize);
 
     return () => {
       resizeObserver.disconnect();
-      window.removeEventListener("resize", updateItemsPerPage);
+      window.removeEventListener("resize", debouncedResize);
     };
-  }, []);
+  }, [updateItemsPerPage]);
 
-  const scrollToIndex = (index: number) => {
+  const scrollToIndex = useCallback((index: number) => {
     const targetItem = itemRefs.current[index];
     if (targetItem && scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -56,30 +71,44 @@ const NetflixCarousel = ({ movies }: Props) => {
       });
       setCurrentIndex(index);
     }
-  };
+  }, []);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     const newIndex = Math.max(0, currentIndex - itemsPerPage);
     scrollToIndex(newIndex);
-  };
+  }, [currentIndex, itemsPerPage, scrollToIndex]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const maxIndex = movies.length - itemsPerPage;
     const newIndex = Math.min(currentIndex + itemsPerPage, maxIndex);
     scrollToIndex(newIndex);
-  };
+  }, [currentIndex, itemsPerPage, movies.length, scrollToIndex]);
 
-  const itemStyle = {
-    flex: `0 0 ${100 / itemsPerPage}%`,
-    scrollSnapAlign: "start",
-    alignSelf: "center",
-    justifyItems: "center",
-    padding: "0 0.5rem",
-    boxSizing: "border-box" as const,
+  const itemStyle = useMemo(
+    () => ({
+      flex: `0 0 ${100 / itemsPerPage}%`,
+      scrollSnapAlign: "start",
+      alignSelf: "center",
+      justifyItems: "center",
+      padding: "0 0.5rem",
+      boxSizing: "border-box" as const,
+    }),
+    [itemsPerPage]
+  );
+
+  const setItemRef = (index: number) => (el: HTMLDivElement | null) => {
+    itemRefs.current[index] = el;
   };
 
   return (
-    <div ref={containerRef} style={{ padding: "1rem", width: "100%" }}>
+    <div
+      ref={containerRef}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+      }}
+    >
       <h2
         style={{
           fontSize: "1.5rem",
@@ -98,7 +127,16 @@ const NetflixCarousel = ({ movies }: Props) => {
           width: "100%",
         }}
       >
-        <button onClick={handlePrev} style={navButtonStyle("left")}>
+        <button
+          onClick={handlePrev}
+          disabled={currentIndex === 0}
+          style={{
+            ...navButtonStyle("left"),
+            opacity: currentIndex === 0 ? 0.4 : 1,
+            cursor: currentIndex === 0 ? "default" : "pointer",
+          }}
+          aria-label="Previous movies"
+        >
           &#8249;
         </button>
 
@@ -115,17 +153,16 @@ const NetflixCarousel = ({ movies }: Props) => {
           }}
         >
           {movies.map((movie, index) => (
-            <div
-              key={movie.id}
-              ref={(el) => (itemRefs.current[index] = el)}
-              style={itemStyle}
-            >
+            <div key={movie.id} ref={setItemRef(index)} style={itemStyle}>
               <img
+                loading="lazy"
                 src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
-                alt={movie.title}
+                alt={movie.title || "Movie poster"}
                 style={{
                   borderRadius: "8px",
                   boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  width: "100%",
+                  height: "auto",
                 }}
               />
               <p
@@ -142,7 +179,19 @@ const NetflixCarousel = ({ movies }: Props) => {
           ))}
         </div>
 
-        <button onClick={handleNext} style={navButtonStyle("right")}>
+        <button
+          onClick={handleNext}
+          disabled={currentIndex + itemsPerPage >= movies.length}
+          style={{
+            ...navButtonStyle("right"),
+            opacity: currentIndex + itemsPerPage >= movies.length ? 0.4 : 1,
+            cursor:
+              currentIndex + itemsPerPage >= movies.length
+                ? "default"
+                : "pointer",
+          }}
+          aria-label="Next movies"
+        >
           &#8250;
         </button>
       </div>
@@ -163,7 +212,6 @@ const navButtonStyle = (side: "left" | "right") => ({
   fontSize: "1.5rem",
   width: "2.5rem",
   height: "2.5rem",
-  cursor: "pointer",
 });
 
 export default NetflixCarousel;
