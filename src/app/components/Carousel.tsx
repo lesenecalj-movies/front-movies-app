@@ -8,7 +8,6 @@ interface NetflixCarouselProps {
   movies: Movie[];
   itemWidth?: number;
   gap?: number;
-  visibleItemCount?: number;
 }
 
 const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
@@ -16,9 +15,13 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
   itemWidth = 199,
   gap = 10,
 }) => {
+  const [fullyVisibleIds, setFullyVisibleIds] = useState<Set<number>>(
+    new Set()
+  );
+
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const [visibleItemCount, setVisibleItemCount] = useState(5);
   const [hoveredMovie, setHoveredMovie] = useState<Movie | null>(null);
-  const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const [previewPosition, setPreviewPosition] = useState<{
     top: number;
     left: number;
@@ -27,7 +30,9 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
   } | null>(null);
 
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const observer = useRef<IntersectionObserver | null>(null);
 
   const setItemRef = (id: number) => (el: HTMLDivElement | null) => {
     if (el) {
@@ -38,35 +43,80 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
   };
 
   useEffect(() => {
-    updateVisibleItemCount();
-    window.addEventListener("resize", updateVisibleItemCount);
-    return () => window.removeEventListener("resize", updateVisibleItemCount);
-  }, []);
+    if (observer.current) {
+      observer.current.disconnect();
+    }
 
-  const updateVisibleItemCount = () => {
-    if (!containerRef.current) return;
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        const visible = new Set(fullyVisibleIds); // clone previous visible set
 
-    const fullWidth = containerRef.current.offsetWidth;
-    const totalItemWidth = itemWidth + gap;
+        entries.forEach((entry) => {
+          const target = entry.target as HTMLElement;
+          const id = Number(target.dataset.id);
 
-    const count = Math.floor((fullWidth + gap) / totalItemWidth); // ensure full items only
+          if (entry.intersectionRatio >= 1) {
+            visible.add(id);
+          } else {
+            visible.delete(id);
+          }
+        });
 
-    const newContainerWidth = count * totalItemWidth - gap; // total width of fully visible items
-    setVisibleItemCount(count);
-    setContainerWidth(newContainerWidth);
-  };
+        setFullyVisibleIds(visible);
+      },
+      {
+        root: containerRef.current,
+        threshold: 1.0,
+      }
+    );
 
-  const handleScroll = (direction: "left" | "right") => {
+    itemRefs.current.forEach((el) => observer.current?.observe(el));
+
+    return () => observer.current?.disconnect();
+  }, [movies, fullyVisibleIds]);
+
+  useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      const containerWidth = container.offsetWidth;
+      const totalItemWidth = itemWidth + gap;
+
+      const count = Math.floor((containerWidth + gap) / totalItemWidth);
+      const adjustedWidth = count * totalItemWidth - gap;
+
+      setVisibleItemCount(count);
+      setContainerWidth(adjustedWidth);
+
+      itemRefs.current.forEach((el) => {
+        observer.current?.unobserve(el);
+        observer.current?.observe(el);
+      });
+    });
+
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [itemWidth, gap]);
+
+  const handleScroll = (direction: "left" | "right") => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
     const scrollAmount = visibleItemCount * (itemWidth + gap);
-    container.scrollBy({
+    wrapper.scrollBy({
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
     });
   };
 
   const handleMouseEnter = (movie: Movie, e: React.MouseEvent) => {
+    if (!fullyVisibleIds.has(movie.id)) {
+      return;
+    }
+
     if (movie !== hoveredMovie) {
       const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
       setHoveredMovie(movie);
@@ -87,7 +137,7 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
   };
 
   return (
-    <div className={styles.carousel_container}>
+    <div className={styles.carousel_container} ref={containerRef}>
       <div className={styles.container_carousel_buton}>
         <button
           className={`${styles.carousel_button} ${styles.left}`}
@@ -96,9 +146,10 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
           <ChevronLeft size={32} />
         </button>
       </div>
+
       <div
         className={styles.carousel_wrapper}
-        ref={containerRef}
+        ref={wrapperRef}
         style={{
           gap: `${gap}px`,
           width: containerWidth ? `${containerWidth}px` : "100%",
@@ -106,7 +157,7 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
           display: "flex",
         }}
       >
-        {movies.map((movie) => (
+        {(movies).map((movie) => (
           <div
             key={movie.id}
             data-id={movie.id}
@@ -139,7 +190,7 @@ const NetflixCarousel: React.FC<NetflixCarouselProps> = ({
           className={styles.preview_container}
           style={{
             position: "absolute",
-            top: `${previewPosition.top + window.scrollY - 150}px`, // Adjust the offset as needed
+            top: `${previewPosition.top + window.scrollY - 150}px`,
             left: `${previewPosition.left + previewPosition.width / 2}px`,
             transform: "translateX(-50%)",
             zIndex: 10,
