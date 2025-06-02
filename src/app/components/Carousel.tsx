@@ -17,32 +17,28 @@ const NetflixCarousel = ({ movies }: Props) => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Function to update itemsPerPage based on container width
   const updateItemsPerPage = () => {
     if (!containerRef.current) return;
     const width = containerRef.current.offsetWidth;
-    console.log({ width });
-    if (width < 600) setItemsPerPage(1);
-    else if (width < 900) setItemsPerPage(2);
-    else if (width < 1200) setItemsPerPage(3);
-    else if (width < 1500) setItemsPerPage(4);
-    else setItemsPerPage(5);
-    console.log({ itemsPerPage });
+    if (width < 576) setItemsPerPage(1); // xs
+    else if (width < 768) setItemsPerPage(2); // sm
+    else if (width < 992) setItemsPerPage(3); // md
+    else if (width < 1200) setItemsPerPage(4); // lg
+    else if (width < 1400) setItemsPerPage(5); // xl
+    else setItemsPerPage(6);
   };
 
   useEffect(() => {
-    updateItemsPerPage(); // initial check
+    updateItemsPerPage();
 
     const container = containerRef.current;
     if (!container) return;
 
-    // ResizeObserver on containerRef
     const resizeObserver = new ResizeObserver(() => {
       updateItemsPerPage();
     });
     resizeObserver.observe(container);
 
-    // Fallback window resize event listener
     window.addEventListener("resize", updateItemsPerPage);
 
     return () => {
@@ -76,12 +72,14 @@ const NetflixCarousel = ({ movies }: Props) => {
   const itemStyle = {
     flex: `0 0 ${100 / itemsPerPage}%`,
     scrollSnapAlign: "start",
+    alignSelf: "center",
+    justifyItems: "center",
     padding: "0 0.5rem",
     boxSizing: "border-box" as const,
   };
 
   return (
-    <div ref={containerRef} style={{ padding: "1rem", width: '100%' }}>
+    <div ref={containerRef} style={{ padding: "1rem", width: "100%" }}>
       <h2
         style={{
           fontSize: "1.5rem",
@@ -123,10 +121,9 @@ const NetflixCarousel = ({ movies }: Props) => {
               style={itemStyle}
             >
               <img
-                src={`https://image.tmdb.org/t/p/w300/${movie.poster_path}`}
+                src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
                 alt={movie.title}
                 style={{
-                  width: "100%",
                   borderRadius: "8px",
                   boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                 }}
