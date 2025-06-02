@@ -1,131 +1,39 @@
-.carousel_container {
-  position: relative;
+.container_carousel {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
+  flex-direction: column;
   width: 100%;
-
-  .carousel_wrapper {
-    display: flex;
-    overflow-x: auto;
-    height: 300px;
-    padding: 1rem 0;
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; // Firefox
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none; // Chrome/Safari
-    }
-
-    .carousel_item {
-      position: relative;
-      scroll-snap-align: start;
-      background-color: #222;
-      border-radius: 8px;
-      overflow: visible;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: fill;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
-    }
+  .carousel_title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
   }
-
-
-  .container_carousel_buton {
+  .wrapper_carousel {
+    position: relative;
     display: flex;
-    justify-content: center;
-    flex: 1;
-    .carousel_button {
-      z-index: 10;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      border: none;
-      padding: 0.5rem;
-      border-radius: 50%;
-      cursor: pointer;
-
-      &.left {
-        left: 10px;
-      }
-
-      &.right {
-        right: 10px;
-      }
-    }
-  }
-}
-
-.preview_container {
-  position: absolute;
-  width: 300px; // larger than the normal card
-  height: 400px;
-  background: #111;
-  color: white;
-  border-radius: 12px;
-  overflow: hidden;
-  z-index: 10;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  pointer-events: auto;
-
-  display: flex;
-  flex-direction: column;
-}
-
-.movie_preview {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: translateY(-20%);
-  width: 300px;
-  height: 400px;
-  background: #111;
-  color: white;
-  border-radius: 12px;
-  z-index: 10;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  pointer-events: auto;
-
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  .preview_backdrop {
+    align-items: center;
     width: 100%;
-    height: 180px;
-    object-fit: cover;
-    flex-shrink: 0;
   }
-
-  .preview_content {
-    padding: 1rem;
-    overflow: auto; // allows scroll if overview is long
-    flex-grow: 1; // fills remaining space
+  .container_scroll {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 0.5rem;
-
-    h4 {
-      margin: 0;
-      font-size: 1.1rem;
+    overflow-x: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    width: 100%;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .carousel_item {
+    .img {
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        height: auto;
     }
-
-    p {
+    .description {
+      margin-top: 0.5rem;
+      text-align: center;
       font-size: 0.9rem;
-      color: #ccc;
+      font-weight: 500;
     }
   }
 }

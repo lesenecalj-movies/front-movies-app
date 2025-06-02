@@ -6,6 +6,8 @@ import React, {
   useCallback,
 } from "react";
 
+import styles from "../../styles/movie.carousel.module.scss";
+
 interface Movie {
   id: number;
   title: string;
@@ -101,32 +103,10 @@ const NetflixCarousel = ({ movies }: Props) => {
   };
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-      }}
-    >
-      <h2
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: "bold",
-          marginBottom: "0.5rem",
-        }}
-      >
-        Popular Movies
-      </h2>
+    <div ref={containerRef} className={styles.container_carousel}>
+      <h2 className={styles.carousel_title}>Popular Movies</h2>
 
-      <div
-        style={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
+      <div className={styles.wrapper_carousel}>
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
@@ -140,41 +120,21 @@ const NetflixCarousel = ({ movies }: Props) => {
           &#8249;
         </button>
 
-        <div
-          ref={scrollRef}
-          style={{
-            display: "flex",
-            overflowX: "hidden",
-            scrollSnapType: "x mandatory",
-            scrollBehavior: "smooth",
-            width: "100%",
-            flexShrink: 1,
-            minWidth: 0,
-          }}
-        >
+        <div ref={scrollRef} className={styles.container_scroll}>
           {movies.map((movie, index) => (
-            <div key={movie.id} ref={setItemRef(index)} style={itemStyle}>
+            <div
+              className={styles.carousel_item}
+              key={movie.id}
+              ref={setItemRef(index)}
+              style={itemStyle}
+            >
               <img
                 loading="lazy"
                 src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
                 alt={movie.title || "Movie poster"}
-                style={{
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                  width: "100%",
-                  height: "auto",
-                }}
+                className={styles.img}
               />
-              <p
-                style={{
-                  marginTop: "0.5rem",
-                  textAlign: "center",
-                  fontSize: "0.9rem",
-                  fontWeight: "500",
-                }}
-              >
-                {movie.title}
-              </p>
+              <p className={styles.description}>{movie.title}</p>
             </div>
           ))}
         </div>
