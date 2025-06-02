@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../styles/movie.categories.module.scss";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { Movie } from "./interfaces/movie.types";
 import NetflixCarousel from "./Carousel";
 
