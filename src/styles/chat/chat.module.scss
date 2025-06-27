@@ -1,0 +1,41 @@
+.container_chat_window {
+  display: flex;
+  flex: 1;
+  height: 100vh; // clé : fixe la hauteur globale
+  width: 100%;
+
+  .container_chat_messages {
+    display: flex;
+    flex: 1;
+    border: 1px solid;
+    flex-direction: column;
+    height: 500px; // important
+    width: 100%;
+    .chat_messages {
+      flex: 1;
+      overflow-y: scroll;
+      .chat_message {
+        padding: .5rem 1rem;
+      }
+    }
+    .container_chat_input {
+      padding: 1rem;
+    }
+  }
+
+  .container_chat_response {
+    display: flex;
+    flex: 2;
+    justify-content: center;
+    .container_suggested_movies {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: start;
+    }
+  }
+}
+
+
+
