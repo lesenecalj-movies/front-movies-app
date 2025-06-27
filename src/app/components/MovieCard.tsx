@@ -13,7 +13,6 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
   const [movieProviders, setMovieProviders] =
     useState<{ name: string; logoPath: string }[]>();
 
-  // Fetch details only when hovering
   useEffect(() => {
     if (isHovered && !movieDetails) {
       getMovieDetails();

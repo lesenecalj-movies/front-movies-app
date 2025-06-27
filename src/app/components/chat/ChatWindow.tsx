@@ -1,30 +1,13 @@
-// components/ChatWindow.tsx
 import { useState } from "react";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import styles from "../../../styles/chat/chat.module.scss";
 import MovieCard from "../MovieCard";
-
-type Movie = {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-};
+import { Movie } from "../interfaces/movie.types";
 
 export default function ChatWindow() {
   const [messages, setMessages] = useState<
-    { type: "user" | "bot"; content: string }[]
+    { type: "user" | "bot"; content: string | Movie[] }[]
   >([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [suggestedMovies, setSuggestedMovies] = useState<Movie[]>([]);
@@ -34,39 +17,18 @@ export default function ChatWindow() {
     setIsStreaming(true);
     setSuggestedMovies([]);
 
-    const eventSource = new EventSource(
-      `http://localhost:3001/movies/suggestions?userRequest=${content}`
-    );
-    let botMessage = "";
-
-    eventSource.onmessage = (event) => {
-      if (event.data === "[END]") {
-        eventSource.close();
-        setIsStreaming(false);
-        setMessages((prev) => [...prev, { type: "bot", content: botMessage }]);
-      } else {
-        const movie = JSON.parse(event.data);
-        botMessage += movie.title;
-
-        setSuggestedMovies((prev) => {
-          return [...prev, movie];
-        });
-
-        setMessages((prev) => {
-          const last = prev[prev.length - 1];
-          if (last?.type === "bot") {
-            return [...prev.slice(0, -1), { ...last, content: botMessage }];
-          } else {
-            return [...prev, { type: "bot", content: botMessage }];
-          }
-        });
-      }
-    };
-
-    eventSource.onerror = () => {
-      eventSource.close();
+    try {
+      const res = await fetch(`http://localhost:3001/movies/suggestions?userRequest=${content}`);
+      if (!res.ok) throw new Error('Erreur lors de la récupération des suggestions');
+      const movies: Movie[] = await res.json();
+    
+      setSuggestedMovies(movies);
+      setMessages((prev) => [...prev, { type: "bot", content: movies }]);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
       setIsStreaming(false);
-    };
+    }
   };
 
   return (

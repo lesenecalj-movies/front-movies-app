@@ -1,16 +1,22 @@
-
 import styles from "../../../styles/chat/chat.module.scss";
+import { Movie } from "../interfaces/movie.types";
 
 interface ChatMessageProps {
   type: "user" | "bot";
-  content: string;
+  content: string | Movie[];
 }
 
 export default function ChatMessage({ type, content }: ChatMessageProps) {
   const isUser = type === "user";
 
   return (
-    <div className={styles.chat_message} style={{ display: "flex", justifyContent: isUser ? "flex-end" : "flex-start" }}>
+    <div
+      className={styles.chat_message}
+      style={{
+        display: "flex",
+        justifyContent: isUser ? "flex-end" : "flex-start",
+      }}
+    >
       <div
         style={{
           backgroundColor: isUser ? "#007bff" : "#e0e0e0",
@@ -21,11 +27,12 @@ export default function ChatMessage({ type, content }: ChatMessageProps) {
           whiteSpace: "pre-wrap",
         }}
       >
-        
-        {isUser && content}
-        {!isUser && (
+        {isUser && typeof content === "string" && <span>test: {content}</span>}
+        {!isUser && typeof content === "object" && (
           <ul>
-            <li>{content}</li>
+            {content.map((c, idx) => (
+              <li key={idx}>{c.title}</li>
+            ))}
           </ul>
         )}
       </div>
