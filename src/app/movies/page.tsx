@@ -4,9 +4,10 @@ import GridMovies from "../components/GridMovies";
 import Image from "next/image";
 import { useState } from "react";
 import CategoriesMovies from "../components/CategoriesMovies";
+import ChatWindow from "../components/chat/ChatWindow";
 
 export default function Movies() {
-  const [viewMode, setViewMode] = useState<"grid" | "categories">("grid");
+  const [viewMode, setViewMode] = useState<"search" | "grid" | "categories">("grid");
 
   return (
     <div className={styles.container}>
@@ -16,6 +17,9 @@ export default function Movies() {
 
       <main className={styles.container_movies_display}>
         <div className={styles.display}>
+          <button onClick={() => setViewMode("search")}>
+          <Image src="/icons/search.png" alt="Grille" width={24} height={24} />
+          </button>
           <button onClick={() => setViewMode("grid")}>
             <Image src="/icons/grid.png" alt="Grille" width={24} height={24} />
           </button>
@@ -29,9 +33,8 @@ export default function Movies() {
           </button>
         </div>
 
-        {viewMode === "grid" && (
-          <GridMovies active={viewMode === "grid"} />
-        )}
+        {viewMode === "search" && <ChatWindow />}
+        {viewMode === "grid" && <GridMovies active={viewMode === "grid"} />}
         {viewMode === "categories" && (
           <CategoriesMovies active={viewMode === "categories"} />
         )}

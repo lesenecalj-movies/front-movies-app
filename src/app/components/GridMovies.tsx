@@ -2,16 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "../../styles/movie.grid.module.scss";
 import MovieCard from "./MovieCard";
 import MovieFilters from "./MovieFilters";
-
-type Movie = {
-  id: number;
-  title: string;
-  poster_path: string;
-  popularity: number;
-  vote_average: number;
-  backdrop_path: string;
-  genre_ids: number[];
-};
+import { Movie } from "./interfaces/movie.types";
 
 export default function GridMovies({ active }: { active: boolean }) {
   const [movies, setMovies] = useState<Movie[]>([]);
