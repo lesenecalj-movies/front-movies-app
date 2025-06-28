@@ -27,7 +27,7 @@ export default function ChatMessage({ type, content }: ChatMessageProps) {
           whiteSpace: "pre-wrap",
         }}
       >
-        {isUser && typeof content === "string" && <span>test: {content}</span>}
+        {isUser && typeof content === "string" && <span> {content} </span>}
         {!isUser && typeof content === "object" && (
           <ul>
             {content.map((c, idx) => (

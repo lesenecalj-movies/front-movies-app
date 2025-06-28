@@ -1,5 +1,5 @@
 // components/ChatInput.tsx
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import styles from "../../../styles/chat/chat.module.scss";
 
@@ -9,8 +9,14 @@ export default function ChatInput({
 }: {
   onSend: (msg: string) => void;
   disabled?: boolean;
+
 }) {
   const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus(); // focus on mount
+  }, []);
 
   const handleSend = () => {
     if (input.trim()) {
@@ -21,10 +27,11 @@ export default function ChatInput({
 
   return (
     <div
-      className={styles.container_chat_input}
-      style={{ display: "flex", gap: "8px" }}
+      className={styles.chat_input}
+      style={{ display: "flex", gap: "8px", height: '100%', alignItems: 'center' }}
     >
       <input
+        ref={inputRef}
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
@@ -41,7 +48,7 @@ export default function ChatInput({
         onClick={handleSend}
         disabled={disabled}
         style={{
-          backgroundColor: "#007bff",
+          backgroundColor: 'transparent',
           color: "white",
           padding: "8px 16px",
           border: "none",
