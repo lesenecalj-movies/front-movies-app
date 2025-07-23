@@ -12,6 +12,7 @@ export default function GridMovies({ active }: { active: boolean }) {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+  const selectedGenresKey = selectedGenres.sort((a, b) => a - b).join(",");
   const [rate, setRate] = useState<number>(50);
 
   useEffect(() => {
@@ -19,12 +20,12 @@ export default function GridMovies({ active }: { active: boolean }) {
     setMovies([]);
     setHasMore(true);
     setNextPage(1);
-  }, [selectedGenres, rate, active]);
+  }, [selectedGenresKey, rate, active]);
 
   useEffect(() => {
     if (!active) return;
     fetchPopularMovies(selectedGenres, rate, page);
-  }, [page, selectedGenres, rate, active]);
+  }, [page, selectedGenresKey, rate, active]);
 
   const toggleGenre = (id: number) => {
     setSelectedGenres((prev) =>
@@ -91,7 +92,7 @@ export default function GridMovies({ active }: { active: boolean }) {
             setNextPage((prevPage) => prevPage + 1);
           }
         },
-        { rootMargin: "100px" }
+        { rootMargin: "300px" }
       );
 
       if (node) observerRef.current.observe(node);

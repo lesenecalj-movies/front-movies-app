@@ -40,14 +40,7 @@ export default function ChatWindow() {
   }, [messages]);
 
   return (
-    <div
-      className={styles.container_chat_window}
-      style={{
-        backgroundColor: "white",
-        borderRadius: "12px",
-        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-      }}
-    >
+    <div className={styles.container_chat_window}>
       <div className={styles.container_chat}>
         <div className={styles.inner_container_chat}>
           <div className={styles.container_chat_messages}>
