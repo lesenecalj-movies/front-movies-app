@@ -7,12 +7,8 @@ import React, {
 } from "react";
 
 import styles from "../../styles/movie.carousel.module.scss";
-
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string;
-}
+import MovieCard from "./MovieCard";
+import { Movie } from "./interfaces/movie.types";
 
 interface Props {
   movies: Movie[];
@@ -67,8 +63,8 @@ const NetflixCarousel = ({ movies }: Props) => {
   const scrollToIndex = useCallback((index: number) => {
     const targetItem = itemRefs.current[index];
     if (targetItem && scrollRef.current) {
-      scrollRef.current.scrollTo({
-        left: targetItem.offsetLeft,
+      scrollRef.current.scrollBy({
+        left: scrollRef.current.offsetWidth,
         behavior: "smooth",
       });
       setCurrentIndex(index);
@@ -120,23 +116,20 @@ const NetflixCarousel = ({ movies }: Props) => {
           &#8249;
         </button>
 
-        <div ref={scrollRef} className={styles.container_scroll}>
-          {movies.map((movie, index) => (
-            <div
-              className={styles.carousel_item}
-              key={movie.id}
-              ref={setItemRef(index)}
-              style={itemStyle}
-            >
-              <img
-                loading="lazy"
-                src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
-                alt={movie.title || "Movie poster"}
-                className={styles.img}
-              />
-              <p className={styles.description}>{movie.title}</p>
-            </div>
-          ))}
+        <div className={styles.scroll_wrapper}>
+          <div ref={scrollRef} className={styles.container_scroll}>
+            {movies.map((movie, index) => (
+              <div
+                className={styles.carousel_item}
+                key={movie.id}
+                ref={setItemRef(index)}
+                style={itemStyle}
+              >
+                <MovieCard movie={movie} />
+                <p className={styles.description}>{movie.title}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <button

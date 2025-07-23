@@ -13,12 +13,22 @@
     align-items: center;
     width: 100%;
   }
+
+  .scroll_wrapper{
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    
+    width: 100%;
+    position: relative;
+    padding: 5rem 0; // enough room for hover effects
+  }
   .container_scroll {
     display: flex;
-    overflow-x: hidden;
+    overflow: visible;
+    width: max-content;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    width: 100%;
     flex-shrink: 1;
     min-width: 0;
   }
