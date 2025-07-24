@@ -1,13 +1,13 @@
+import { getFormattedRateAndTheme } from '@/lib/utils';
+import { getMovieDetails, getMovieProviders } from '@/services/movie.services';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import styles from '../../styles/movie.card.module.scss';
-import { useCallback, useEffect, useState } from 'react';
 import {
   MovieDetails,
   MovieProps,
   MovieProvider,
 } from '../../types/movie.types';
-import { getFormattedRateAndTheme } from '@/lib/utils';
-import { getMovieDetails, getMovieProviders } from '@/services/movie.services';
 
 export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -15,19 +15,39 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
   const [movieProviders, setMovieProviders] =
     useState<{ name: string; logoPath: string }[]>();
 
+  const [formattedRateMovie, themeMovie] = movie.vote_average
+    ? getFormattedRateAndTheme(movie.vote_average)
+    : [null, ''];
+
   useEffect(() => {
-    if (isHovered && !movieDetails) {
-      fetchMovieDetails();
-      fetchProviders();
-    }
-  }, [isHovered, movieDetails]);
+    if (!isHovered || movieDetails) return;
+
+    const fetchData = async () => {
+      try {
+        const [details, providersData] = await Promise.all([
+          getMovieDetails(movie.id),
+          getMovieProviders(movie.id),
+        ]);
+
+        setMovieDetails(details);
+
+        /** todo: define lang somewhere. */
+        const flatrates = providersData?.results?.['CA']?.flatrate ?? [];
+        setMovieProviders(getParentProviders(flatrates));
+      } catch (error) {
+        console.error('Failed to fetch movie data:', error);
+      }
+    };
+
+    fetchData();
+  }, [isHovered, movieDetails, movie.id]);
 
   const getParentProviders = (flatrates: MovieProvider[]) => {
     const uniqProviders: { name: string; logoPath: string }[] = [];
 
     flatrates
       .sort((a, b) => a.display_priority - b.display_priority)
-      .map((flatrate) => {
+      .forEach((flatrate) => {
         const exists = uniqProviders.some((provider) =>
           flatrate.provider_name.startsWith(provider.name.substring(0, 3)),
         );
@@ -40,37 +60,6 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
       });
     return uniqProviders;
   };
-
-  const fetchProviders = useCallback(async () => {
-    if (!movie.id) return;
-
-    try {
-      const data = await getMovieProviders(movie.id);
-      const flatrates =
-        data.results && data.results['CA'] && data.results['CA'].flatrate
-          ? data.results['CA'].flatrate
-          : [];
-      if (flatrates) {
-        setMovieProviders(getParentProviders(flatrates));
-      }
-    } catch (error) {
-      console.error('Failed to fetch movie details:', error);
-    }
-  }, [movie.id]);
-
-  const fetchMovieDetails = useCallback(async () => {
-    if (!movie.id) return;
-    try {
-      const data = await getMovieDetails(movie.id);
-      setMovieDetails(data);
-    } catch (error) {
-      console.error('Failed to fetch movie details:', error);
-    }
-  }, [movie.id]);
-
-  const [formattedRateMovie, themeMovie] = movie.vote_average
-    ? getFormattedRateAndTheme(movie.vote_average)
-    : [null, ''];
 
   return (
     <div
