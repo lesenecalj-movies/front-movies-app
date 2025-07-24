@@ -22,68 +22,70 @@ export default function GridMovies({ active }: { active: boolean }) {
 
   const filtersKey = selectedGenres.sort().join(',') + `-${rate}`;
 
-  // Reset movies when filters change
   useEffect(() => {
     if (!active) return;
-    setMovies([]);
-    setPage(1);
-    setHasMore(true);
+
+    const fetchInitialMovies = async () => {
+      setLoading(true);
+      try {
+        const data = await discoverMovies(
+          selectedGenres.length ? selectedGenres : [],
+          rate,
+          1
+        );
+        setMovies(data.results);
+        setHasMore(data.results.length > 0);
+        setPage(1);
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialMovies();
   }, [filtersKey, active]);
 
-  // Fetch movies when page or filters change
+  // Scroll infini quand page > 1
   useEffect(() => {
-    if (!active) return;
-    const fetchMovies = async () => {
-      if (loading || !hasMore) return;
-      setLoading(true);
+    if (!active || page === 1 || loading || !hasMore) return;
 
+    const fetchMoreMovies = async () => {
+      setLoading(true);
       try {
         const data = await discoverMovies(
           selectedGenres.length ? selectedGenres : [],
           rate,
           page
         );
-
-        setMovies((prevMovies) => {
-          const movieSet = new Set(prevMovies.map((m) => m.id));
-          const newMovies = data.results.filter(
-            (movie) => !movieSet.has(movie.id)
-          );
-          return page === 1 ? newMovies : [...prevMovies, ...newMovies];
+        setMovies((prev) => {
+          const prevIds = new Set(prev.map((m) => m.id));
+          const newMovies = data.results.filter((m) => !prevIds.has(m.id));
+          return [...prev, ...newMovies];
         });
-
         setHasMore(data.results.length > 0);
       } catch (error) {
-        console.error('Error fetching popular movies:', error);
+        console.error('Error loading more movies:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMovies();
-  }, [page, filtersKey, active]);
+    fetchMoreMovies();
+  }, [page, active]);
 
   const lastMovieRef = useInfiniteScroll(loading, hasMore, () =>
     setPage((prev) => prev + 1)
   );
 
-  const enhancedToggleRate = (newRate: number) => {
-    baseToggleRate(newRate);
-  };
-
-  const enhancedToggleGenre = (id: number) => {
-    toggleGenre(id);
-  };
-
   return (
     <div className={styles.container_grid}>
       <MovieFilters
         genres={selectedGenres}
-        toggleGenre={enhancedToggleGenre}
+        toggleGenre={toggleGenre}
         rate={rate}
-        toggleRate={enhancedToggleRate}
+        toggleRate={baseToggleRate}
       />
-
       <div className={styles.grid}>
         {movies.map((movie, index) => (
           <MovieCard

@@ -1,11 +1,13 @@
-import Image from "next/image";
-import styles from "../../styles/movie.card.module.scss";
-import { useCallback, useEffect, useState } from "react";
+import Image from 'next/image';
+import styles from '../../styles/movie.card.module.scss';
+import { useCallback, useEffect, useState } from 'react';
 import {
   MovieDetails,
   MovieProps,
   MovieProvider,
-} from "../../types/movie.types";
+} from '../../types/movie.types';
+import { getFormattedRateAndTheme } from '@/lib/utils';
+import { getMovieDetails, getMovieProviders } from '@/services/movie.services';
 
 export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -15,8 +17,8 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
 
   useEffect(() => {
     if (isHovered && !movieDetails) {
-      getMovieDetails();
-      getProviders();
+      fetchMovieDetails();
+      fetchProviders();
     }
   }, [isHovered, movieDetails]);
 
@@ -27,7 +29,7 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
       .sort((a, b) => a.display_priority - b.display_priority)
       .map((flatrate) => {
         const exists = uniqProviders.some((provider) =>
-          flatrate.provider_name.startsWith(provider.name.substring(0, 3))
+          flatrate.provider_name.startsWith(provider.name.substring(0, 3)),
         );
         if (!exists) {
           uniqProviders.push({
@@ -39,65 +41,40 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
     return uniqProviders;
   };
 
-  const getFormattedRateAndTheme = (value: number) => {
-    const percentage = (value / 10) * 100;
-    const decimalPart = percentage - Math.floor(percentage);
-
-    const result =
-      decimalPart < 0.5 ? Math.floor(percentage) : Math.ceil(percentage);
-    const theme =
-      result >= 70
-        ? "great_movie"
-        : result <= 45
-        ? "bad_movie"
-        : "medium_movie";
-    return [result, theme];
-  };
-
-  const getProviders = useCallback(async () => {
+  const fetchProviders = useCallback(async () => {
     if (!movie.id) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:3001/movies/${movie.id}/providers`
-      );
-      if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-
-      const data = await res.json();
-
-      const flatrates: MovieProvider[] =
-        data.results && data.results["CA"] && data.results["CA"].flatrate
-          ? data.results["CA"].flatrate
+      const data = await getMovieProviders(movie.id);
+      const flatrates =
+        data.results && data.results['CA'] && data.results['CA'].flatrate
+          ? data.results['CA'].flatrate
           : [];
       if (flatrates) {
         setMovieProviders(getParentProviders(flatrates));
       }
     } catch (error) {
-      console.error("Failed to fetch movie details:", error);
+      console.error('Failed to fetch movie details:', error);
     }
   }, [movie.id]);
 
-  const getMovieDetails = useCallback(async () => {
+  const fetchMovieDetails = useCallback(async () => {
     if (!movie.id) return;
-
     try {
-      const res = await fetch(`http://localhost:3001/movies/${movie.id}`);
-      if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-
-      const data: MovieDetails = await res.json();
+      const data = await getMovieDetails(movie.id);
       setMovieDetails(data);
     } catch (error) {
-      console.error("Failed to fetch movie details:", error);
+      console.error('Failed to fetch movie details:', error);
     }
   }, [movie.id]);
 
   const [formattedRateMovie, themeMovie] = movie.vote_average
     ? getFormattedRateAndTheme(movie.vote_average)
-    : [null, ""];
+    : [null, ''];
 
   return (
     <div
-      className={`${styles.card} ${isHovered ? styles.hovered : ""}`}
+      className={`${styles.card} ${isHovered ? styles.hovered : ''}`}
       ref={lastMovieRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -106,7 +83,7 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
         <div className={styles.circle_container_rated}>
           <div
             className={`${styles.rating_circle} ${
-              themeMovie ? styles[`rating_circle_${themeMovie}`] : ""
+              themeMovie ? styles[`rating_circle_${themeMovie}`] : ''
             }`}
           >
             <span className={styles.vote_average}>{formattedRateMovie}</span>
@@ -142,13 +119,13 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
           </div>
           <div className={styles.extra_details}>
             <div className={styles.runtime_movie}>
-              {movieDetails?.runtime ? `${movieDetails.runtime} min` : "N/A"}
+              {movieDetails?.runtime ? `${movieDetails.runtime} min` : 'N/A'}
             </div>
             <div className={styles.providers_info}>
               {movieProviders?.map(
                 (
                   movieProvider: { name: string; logoPath: string },
-                  index: number
+                  index: number,
                 ) => (
                   <div
                     className="provider"
@@ -162,7 +139,7 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
                       height="30"
                     />
                   </div>
-                )
+                ),
               )}
             </div>
           </div>
