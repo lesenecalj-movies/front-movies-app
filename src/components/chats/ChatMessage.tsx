@@ -1,5 +1,5 @@
-import styles from "../../../styles/chat/chat.module.scss";
-import { Movie } from "../interfaces/movie.types";
+import { Movie } from "@/types/movie.types";
+import styles from "../../styles/chat/chat.module.scss";
 
 interface ChatMessageProps {
   type: "user" | "bot";

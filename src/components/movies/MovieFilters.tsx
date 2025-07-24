@@ -3,7 +3,7 @@ import { Chip, styled } from "@mui/material";
 import Slider from "@mui/material/Slider";
 import { useEffect, useState } from "react";
 import styles from "../../styles/movie.filter.module.scss";
-import { Categorie, MovieFiltersProps } from "./interfaces/movie.types";
+import { MovieFiltersProps, Categorie } from "@/types/movie.types";
 
 export default function MovieFilters(props: MovieFiltersProps) {
   const { genres, toggleGenre, rate, toggleRate } = props;

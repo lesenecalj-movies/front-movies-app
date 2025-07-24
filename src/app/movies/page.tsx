@@ -1,10 +1,10 @@
 "use client";
 import styles from "../../styles/movies.module.scss";
-import GridMovies from "../components/GridMovies";
+import GridMovies from "../../components/movies/GridMovies";
 import Image from "next/image";
 import { useState } from "react";
-import CategoriesMovies from "../components/CategoriesMovies";
-import ChatWindow from "../components/chat/ChatWindow";
+import ChatWindow from "@/components/chats/ChatWindow";
+import CategoriesMovies from "@/components/movies/CategoriesMovies";
 
 export default function Movies() {
   const [viewMode, setViewMode] = useState<"search" | "grid" | "categories">("grid");
