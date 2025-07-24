@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
-import styles from "../../../styles/chat/chat.module.scss";
-import MovieCard from "../MovieCard";
-import { Movie } from "../interfaces/movie.types";
+import styles from "../../styles/chat/chat.module.scss";
+import { Movie } from "@/types/movie.types";
+import MovieCard from "../movies/MovieCard";
+import ChatMessage from "./ChatMessage";
 
 export default function ChatWindow() {
   const [messages, setMessages] = useState<

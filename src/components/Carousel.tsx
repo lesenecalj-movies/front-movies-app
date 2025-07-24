@@ -6,9 +6,9 @@ import React, {
   useCallback,
 } from "react";
 
-import styles from "../../styles/movie.carousel.module.scss";
-import MovieCard from "./MovieCard";
-import { Movie } from "./interfaces/movie.types";
+import styles from '../styles/movie.carousel.module.scss';
+import MovieCard from "./movies/MovieCard";
+import { Movie } from "../types/movie.types";
 
 interface Props {
   movies: Movie[];

@@ -5,7 +5,7 @@ import {
   MovieDetails,
   MovieProps,
   MovieProvider,
-} from "./interfaces/movie.types";
+} from "../../types/movie.types";
 
 export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
   const [isHovered, setIsHovered] = useState(false);

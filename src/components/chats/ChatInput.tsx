@@ -1,7 +1,6 @@
-// components/ChatInput.tsx
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import styles from "../../../styles/chat/chat.module.scss";
+import styles from '../../styles/chat/chat.module.scss';
 
 export default function ChatInput({
   onSend,

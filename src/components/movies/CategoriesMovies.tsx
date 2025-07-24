@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../styles/movie.categories.module.scss";
-import { Movie } from "./interfaces/movie.types";
-import NetflixCarousel from "./Carousel";
+import { Movie } from "@/types/movie.types";
+import NetflixCarousel from "../Carousel";
 
 export default function CategoriesMovies({ active }: { active: boolean }) {
   const [discoverMovies, setDiscoverMovies] = useState<Movie[]>([]);
