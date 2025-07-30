@@ -17,6 +17,7 @@ export async function discoverMovies(
 
   return res.json();
 }
+
 export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
   const res = await fetch(`http://localhost:3001/movies/${movieId}`);
   if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
