@@ -1,6 +1,6 @@
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { discoverMovies } from '../../services/movie.services';
 import styles from '../../styles/movie.grid.module.scss';
 import { Movie } from '../../types/movie.types';
@@ -20,63 +20,66 @@ export default function GridMovies({ active }: { active: boolean }) {
     toggleRate: baseToggleRate,
   } = useMovieFilters();
 
-  const filtersKey = selectedGenres.sort().join(',') + `-${rate}`;
+  const activeGenres = useMemo(() => {
+    return selectedGenres.length ? selectedGenres : [];
+  }, [selectedGenres]);
 
-  useEffect(() => {
-    if (!active) return;
+  const filtersKey = useMemo(() => {
+    return [...selectedGenres].sort().join(',') + `-${rate}`;
+  }, [selectedGenres, rate]);
 
-    const fetchInitialMovies = async () => {
+  const fetchMovies = useCallback(
+    async (page: number) => {
+      if (loading) return;
+
       setLoading(true);
       try {
-        const data = await discoverMovies(
-          selectedGenres.length ? selectedGenres : [],
-          rate,
-          1
-        );
-        setMovies(data.results);
-        setHasMore(data.results.length > 0);
-        setPage(1);
+        const data = await discoverMovies(activeGenres, rate, page);
+        const results = data.results || [];
+
+        if (page === 1) {
+          setMovies(results);
+          setHasMore(results.length > 0);
+          return;
+        }
+
+        if (results.length === 0) {
+          setHasMore(false);
+          return;
+        }
+
+        setMovies((prev) => {
+          const prevIds = new Set(prev.map((m) => m.id));
+          const newMovies = results.filter((m) => !prevIds.has(m.id));
+          return [...prev, ...newMovies];
+        });
+
+        setHasMore(true);
       } catch (error) {
         console.error('Error fetching movies:', error);
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [activeGenres, rate],
+  );
 
-    fetchInitialMovies();
+  useEffect(() => {
+    if (!active) return;
+    setPage(1);
   }, [filtersKey, active]);
 
-  // Scroll infini quand page > 1
+  // Scroll infini when page > 1
   useEffect(() => {
-    if (!active || page === 1 || loading || !hasMore) return;
+    if (!active || !hasMore) return;
+    fetchMovies(page);
+  }, [page, active, hasMore]);
 
-    const fetchMoreMovies = async () => {
-      setLoading(true);
-      try {
-        const data = await discoverMovies(
-          selectedGenres.length ? selectedGenres : [],
-          rate,
-          page
-        );
-        setMovies((prev) => {
-          const prevIds = new Set(prev.map((m) => m.id));
-          const newMovies = data.results.filter((m) => !prevIds.has(m.id));
-          return [...prev, ...newMovies];
-        });
-        setHasMore(data.results.length > 0);
-      } catch (error) {
-        console.error('Error loading more movies:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadMore = useCallback(() => {
+    setPage((prev) => prev + 1);
+  }, []);
 
-    fetchMoreMovies();
-  }, [page, active]);
-
-  const lastMovieRef = useInfiniteScroll(loading, hasMore, () =>
-    setPage((prev) => prev + 1)
-  );
+  const lastMovieRef = useInfiniteScroll(loading, hasMore, loadMore);
 
   return (
     <div className={styles.container_grid}>
