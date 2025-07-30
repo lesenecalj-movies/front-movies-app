@@ -8,8 +8,10 @@ import {
   MovieProps,
   MovieProvider,
 } from '../../types/movie.types';
+import React from 'react';
 
-export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
+
+function MovieCard({ movie, lastMovieRef }: MovieProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [movieDetails, setMovieDetails] = useState<MovieDetails>();
   const [movieProviders, setMovieProviders] =
@@ -137,3 +139,5 @@ export default function MovieCard({ movie, lastMovieRef }: MovieProps) {
     </div>
   );
 }
+
+export default React.memo(MovieCard);
