@@ -5,9 +5,13 @@
   transition: transform 0.3s ease-in-out;
   cursor: pointer;
   z-index: 1;
+  opacity: 1;
+  transition: opacity 250ms ease-in-out;
+  will-change: opacity;
 
   &.hiddenCard {
-    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .imageWrapper {
