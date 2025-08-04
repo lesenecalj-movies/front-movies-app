@@ -60,12 +60,12 @@ function MovieCard({ movie, lastMovieRef, onHover, onUnhover, hidden, cancelUnho
       className={`${styles.card} ${hidden ? styles.hiddenCard : ''}`}
       ref={(el) => {
         cardRef.current = el;
-        if (lastMovieRef) lastMovieRef.current = el;
+        if (lastMovieRef) lastMovieRef(el);
       }}
       onMouseEnter={() => {
         if (cardRef.current) {
-          cancelUnhover();
-          onHover(movie, cardRef.current);
+          cancelUnhover?.();
+          onHover?.(movie, cardRef.current);
         }
       }}
       onMouseLeave={onUnhover}
