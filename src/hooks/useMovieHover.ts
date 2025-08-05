@@ -14,10 +14,13 @@ export function useMovieHover() {
   });
 
   const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
-  const [isPreviewVisible, setPreviewVisible] = useState<boolean>(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const [previewTargetId, setPreviewTargetId] = useState<number | null>(null);
+  const [isPreviewOpen, setPreviewOpen] = useState(false);
+  const [isPreviewExiting, setIsPreviewExiting] = useState(false);
 
+  const transitionDuration = 300;
+  const fetchDelay = 500;
+
+  const currentHoverIdRef = useRef<number | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const detailsCacheRef = useRef<Map<number, MovieDetails>>(new Map());
@@ -29,72 +32,76 @@ export function useMovieHover() {
 
       const rect = element.getBoundingClientRect();
 
-      const isSameCard = previewTargetId === movie.id;
+      currentHoverIdRef.current = movie.id;
 
-      if (!isSameCard && (isPreviewVisible || isHovering)) {
-        setPreviewVisible(false);
-        setIsHovering(true);
-  
-        await new Promise((resolve) => setTimeout(resolve, 300)); // match exit transition
-  
-        setIsHovering(false);
+      // Handle exit transition before showing new preview
+      if (isPreviewOpen || isPreviewExiting) {
+        setPreviewOpen(false);
+        setIsPreviewExiting(true);
+
+        await new Promise((resolve) => setTimeout(resolve, transitionDuration));
+        if (currentHoverIdRef.current !== movie.id) return;
+
+        setIsPreviewExiting(false);
       }
 
-      setPreview((prev) => ({
-        ...prev,
+      setPreview({
         movie,
         position: {
           top: rect.top + window.scrollY - 50,
           left: rect.left + window.scrollX,
           width: rect.width,
         },
-      }));
+      });
 
       setMovieDetails(null);
-      setPreviewVisible(false);
-      setPreviewTargetId(movie.id);
+      setPreviewOpen(false);
 
       fetchTimeoutRef.current = setTimeout(async () => {
-        const cached = detailsCacheRef.current.get(movie.id);
-        if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
-
-        if (cached) {
-          setMovieDetails(cached);
-          setPreviewVisible(true);
-        }
+        const cancelGuard = () => currentHoverIdRef.current !== movie.id;
 
         try {
-          const movieDetails = await getMovieDetails(movie.id);
-          detailsCacheRef.current.set(movie.id, movieDetails);
-          setMovieDetails(movieDetails);
-          setPreviewVisible(true);
-        } catch (e) {
-          console.error('Failed to fetch movie details:', e);
-        }
-      }, 500);
+          const cached = detailsCacheRef.current.get(movie.id);
+          if (cached && !cancelGuard()) {
+            setMovieDetails(cached);
+            setPreviewOpen(true);
+            return;
+          }
 
-    }, [previewTargetId, isPreviewVisible, isHovering],
+          const details = await getMovieDetails(movie.id);
+          if (cancelGuard()) return;
+
+          detailsCacheRef.current.set(movie.id, details);
+          setMovieDetails(details);
+          setPreviewOpen(true);
+        } catch (e) {
+          if (!cancelGuard()) {
+            console.error("Failed to fetch movie details:", e);
+          }
+        }
+      }, fetchDelay);
+    },
+    [isPreviewOpen, isPreviewExiting]
   );
 
-
   const startExit = () => {
-    setPreviewVisible(false);
-    setIsHovering(true);
+    setPreviewOpen(false);
+    setIsPreviewExiting(true);
 
     setTimeout(() => {
-      setIsHovering(false);
-      setPreviewTargetId(null);
+      setIsPreviewExiting(false);
       setMovieDetails(null);
       setPreview({ movie: null, position: null });
-    }, 300); // Match transition duration
+    }, transitionDuration);
   };
 
   const handleUnhover = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);  
+    if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+
     timeoutRef.current = setTimeout(() => {
       startExit();
-    }, 200); // slight delay after unhover
+    }, 200); // delay before exiting
   }, []);
 
   const cancelUnhover = useCallback(() => {
@@ -108,9 +115,8 @@ export function useMovieHover() {
     hoveredMovie: preview.movie,
     previewPosition: preview.position,
     movieDetails,
-    previewTargetId,
-    isExiting: isHovering,
-    isPreviewVisible,
+    isPreviewExiting,
+    isPreviewOpen,
     handleHover,
     handleUnhover,
     cancelUnhover,

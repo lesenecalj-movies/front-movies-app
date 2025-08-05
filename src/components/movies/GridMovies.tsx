@@ -19,8 +19,8 @@ export default function GridMovies({ active }: { active: boolean }) {
     hoveredMovie,
     previewPosition,
     movieDetails,
-    isExiting,
-    isPreviewVisible,
+    isPreviewExiting,
+    isPreviewOpen,
     handleHover,
     handleUnhover,
     cancelUnhover,
@@ -103,8 +103,8 @@ export default function GridMovies({ active }: { active: boolean }) {
           onClose={handleUnhover}
           onMouseEnter={cancelUnhover}
           onMouseLeave={handleUnhover}
-          isExiting={isExiting}
-          isPreviewVisible={isPreviewVisible}
+          isPreviewExiting={isPreviewExiting}
+          isPreviewOpen={isPreviewOpen}
         />
       )}
     </div>

@@ -14,8 +14,8 @@ type Props = {
   onClose: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-  isPreviewVisible: boolean;
-  isExiting: boolean;
+  isPreviewOpen: boolean;
+  isPreviewExiting: boolean;
 };
 
 export default function MoviePreviewCard({
@@ -24,8 +24,8 @@ export default function MoviePreviewCard({
   onClose,
   onMouseEnter,
   onMouseLeave,
-  isPreviewVisible,
-  isExiting,
+  isPreviewOpen,
+  isPreviewExiting,
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -53,8 +53,8 @@ export default function MoviePreviewCard({
   if (!mounted) return null;
 
   const classNames = [styles.previewCard];
-  if (animate && isPreviewVisible) classNames.push(styles.enter);
-  if (isExiting) classNames.push(styles.exit);
+  if (animate && isPreviewOpen) classNames.push(styles.enter);
+  if (isPreviewExiting) classNames.push(styles.exit);
 
   return ReactDOM.createPortal(
     <div
