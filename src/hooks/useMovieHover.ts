@@ -15,17 +15,30 @@ export function useMovieHover() {
 
   const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
   const [isPreviewVisible, setPreviewVisible] = useState<boolean>(false);
+  const [isHovering, setIsHovering] = useState(false);
   const [previewTargetId, setPreviewTargetId] = useState<number | null>(null);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const detailsCacheRef = useRef<Map<number, MovieDetails>>(new Map());
 
-
   const handleHover = useCallback(
     async (movie: Movie, element: HTMLElement) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+
       const rect = element.getBoundingClientRect();
+
+      const isSameCard = previewTargetId === movie.id;
+
+      if (!isSameCard && (isPreviewVisible || isHovering)) {
+        setPreviewVisible(false);
+        setIsHovering(true);
+  
+        await new Promise((resolve) => setTimeout(resolve, 300)); // match exit transition
+  
+        setIsHovering(false);
+      }
 
       setPreview((prev) => ({
         ...prev,
@@ -43,6 +56,8 @@ export function useMovieHover() {
 
       fetchTimeoutRef.current = setTimeout(async () => {
         const cached = detailsCacheRef.current.get(movie.id);
+        if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+
         if (cached) {
           setMovieDetails(cached);
           setPreviewVisible(true);
@@ -58,16 +73,28 @@ export function useMovieHover() {
         }
       }, 500);
 
-    }, [],
+    }, [previewTargetId, isPreviewVisible, isHovering],
   );
 
-  const handleUnhover = useCallback(() => {
-    timeoutRef.current = setTimeout(() => {
-      setPreview({ movie: null, position: null });
-      setMovieDetails(null);
-      setPreviewVisible(false);
+
+  const startExit = () => {
+    setPreviewVisible(false);
+    setIsHovering(true);
+
+    setTimeout(() => {
+      setIsHovering(false);
       setPreviewTargetId(null);
-    }, 200);
+      setMovieDetails(null);
+      setPreview({ movie: null, position: null });
+    }, 300); // Match transition duration
+  };
+
+  const handleUnhover = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);  
+    timeoutRef.current = setTimeout(() => {
+      startExit();
+    }, 200); // slight delay after unhover
   }, []);
 
   const cancelUnhover = useCallback(() => {
@@ -82,6 +109,7 @@ export function useMovieHover() {
     previewPosition: preview.position,
     movieDetails,
     previewTargetId,
+    isExiting: isHovering,
     isPreviewVisible,
     handleHover,
     handleUnhover,

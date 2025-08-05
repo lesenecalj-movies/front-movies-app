@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styles from '../../styles/movie.preview.card.module.scss';
 
@@ -14,6 +14,8 @@ type Props = {
   onClose: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  isPreviewVisible: boolean;
+  isExiting: boolean;
 };
 
 export default function MoviePreviewCard({
@@ -22,17 +24,20 @@ export default function MoviePreviewCard({
   onClose,
   onMouseEnter,
   onMouseLeave,
+  isPreviewVisible,
+  isExiting,
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useLayoutEffect(() => {
-    requestAnimationFrame(() => {
-      setVisible(true);
-    });
-  }, []);
+  const [mounted, setMounted] = useState(false);
+  const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+
+    requestAnimationFrame(() => {
+      setAnimate(true);
+    });
+
     const handleClickOutside = (e: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
         onClose();
@@ -43,29 +48,25 @@ export default function MoviePreviewCard({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [onClose]);
+
+  if (!mounted) return null;
+
+  const classNames = [styles.previewCard];
+  if (animate && isPreviewVisible) classNames.push(styles.enter);
+  if (isExiting) classNames.push(styles.exit);
 
   return ReactDOM.createPortal(
     <div
-      className={styles.previewCard}
+      className={classNames.join(' ')}
       style={{
-        position: 'absolute',
         top: position.top - position.width * -0.15,
         left: position.left - position.width * 0.25,
         width: position.width * 1.5,
-        opacity: visible ? 1 : 0,
-        transform: visible
-          ? 'translateY(-20px) scale(1.4)'
-          : 'translateY(-20px) scale(1.2)',
-        transition: 'opacity 300ms ease, transform 300ms ease',
-        transformOrigin: 'top center',
-        zIndex: 9999,
       }}
       ref={cardRef}
       onMouseEnter={onMouseEnter}
-      onMouseLeave={() => {
-        onMouseLeave();
-      }}
+      onMouseLeave={onMouseLeave}
     >
       <div className={styles.videoWrapper}>
         <iframe

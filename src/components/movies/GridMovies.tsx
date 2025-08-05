@@ -19,7 +19,7 @@ export default function GridMovies({ active }: { active: boolean }) {
     hoveredMovie,
     previewPosition,
     movieDetails,
-    previewTargetId,
+    isExiting,
     isPreviewVisible,
     handleHover,
     handleUnhover,
@@ -85,7 +85,6 @@ export default function GridMovies({ active }: { active: boolean }) {
               onHover={handleHover}
               onUnhover={handleUnhover}
               cancelUnhover={cancelUnhover}
-              hidden={isPreviewVisible && previewTargetId === movie.id}
             />
           );
         })}
@@ -104,6 +103,8 @@ export default function GridMovies({ active }: { active: boolean }) {
           onClose={handleUnhover}
           onMouseEnter={cancelUnhover}
           onMouseLeave={handleUnhover}
+          isExiting={isExiting}
+          isPreviewVisible={isPreviewVisible}
         />
       )}
     </div>
