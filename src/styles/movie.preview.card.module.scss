@@ -1,5 +1,5 @@
 .previewCard {
-  position: absolute;
+  position: fixed;
   z-index: 9999;
   background: #111;
   border-radius: 12px;
@@ -7,12 +7,20 @@
   overflow: hidden;
   pointer-events: none;
 
-  // Initial state: invisible, scaled down
+  // Animation
   opacity: 0;
   transform: translateY(-20px) scale(1.2);
   transform-origin: top center;
   transition: opacity 300ms ease, transform 300ms ease;
   will-change: transform, opacity;
+
+  // Prevent scrollbars
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+
+  // Prevent the body from expanding or scrollbars appearing due to overflows
+  contain: layout paint;
   &.enter {
     opacity: 1;
     transform: translateY(-20px) scale(1.6);
