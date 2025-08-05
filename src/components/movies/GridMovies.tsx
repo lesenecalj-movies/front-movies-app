@@ -3,7 +3,7 @@
 import { useDiscoverMovies } from '@/hooks/useDiscoverMovies';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
-import { usePreviewHover } from '@/hooks/useMovieHover';
+import { usePreviewHover } from '@/hooks/usePreviewHover';
 import { getMovieDetails } from '@/services/movie.services';
 import { useCallback, useEffect, useState } from 'react';
 import styles from '../../styles/movie.grid.module.scss';
