@@ -34,7 +34,11 @@ export type MovieProvider = {
 
 export interface MovieProps {
   movie: Movie;
-  lastMovieRef?: (node: HTMLDivElement | null) => void; // Optional ref for infinite scrolling
+  lastMovieRef?: (node: HTMLDivElement | null) => void;
+  onHover?: (movie: Movie, element: HTMLElement) => void;
+  onUnhover?: () => void;
+  cancelUnhover?: () => void;
+  hidden?: boolean;
 }
 
 export interface MovieFiltersProps {

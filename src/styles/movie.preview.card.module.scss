@@ -1,0 +1,53 @@
+.previewCard {
+  position: fixed;
+  z-index: 9999;
+  background: #111;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  pointer-events: none;
+
+  // Animation
+  opacity: 0;
+  transform: translateY(-20px) scale(1.2);
+  transform-origin: top center;
+  transition: opacity 300ms ease, transform 300ms ease;
+  will-change: transform, opacity;
+
+  // Prevent scrollbars
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+
+  // Prevent the body from expanding or scrollbars appearing due to overflows
+  contain: layout paint;
+  &.enter {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.6);
+    pointer-events: auto;
+  }
+  &.exit {
+    opacity: 0;
+    transform: translateY(-20px) scale(1.2);
+    pointer-events: none;
+  }
+}
+
+.videoWrapper {
+  position: relative;
+  padding-top: 56.25%; // 16:9
+}
+
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.info {
+  padding: 1rem;
+  color: white;
+}

@@ -1,17 +1,30 @@
 'use client';
 
+import { useDiscoverMovies } from '@/hooks/useDiscoverMovies';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
-import { useEffect, useState } from 'react';
+import { useMovieHover } from '@/hooks/useMovieHover';
+import { useCallback, useEffect, useState } from 'react';
 import styles from '../../styles/movie.grid.module.scss';
 import { Movie } from '../../types/movie.types';
 import MovieCard from './MovieCard';
 import MovieFilters from './MovieFilters';
-import { useDiscoverMovies } from '@/hooks/useDiscoverMovies';
+import MoviePreviewCard from './MoviePreviewCard';
 
 export default function GridMovies({ active }: { active: boolean }) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState(1);
+
+  const {
+    hoveredMovie,
+    previewPosition,
+    movieDetails,
+    isPreviewExiting,
+    isPreviewOpen,
+    handleHover,
+    handleUnhover,
+    cancelUnhover,
+  } = useMovieHover();
 
   const {
     selectedGenres,
@@ -46,9 +59,12 @@ export default function GridMovies({ active }: { active: boolean }) {
   }, [data, page]);
 
   const hasMore = !!data?.results.length;
-  const lastMovieRef = useInfiniteScroll(isFetching, hasMore, () =>
-    setPage((prev) => prev + 1),
-  );
+
+  const loadNextPage = useCallback(() => {
+    setPage((prev) => prev + 1);
+  }, []);
+
+  const lastMovieRef = useInfiniteScroll(isFetching, hasMore, loadNextPage);
 
   return (
     <div className={styles.container_grid}>
@@ -59,16 +75,38 @@ export default function GridMovies({ active }: { active: boolean }) {
         toggleRate={baseToggleRate}
       />
       <div className={styles.grid}>
-        {movies.map((movie, index) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-            lastMovieRef={
-              index === movies.length - 1 ? lastMovieRef : undefined
-            }
-          />
-        ))}
+        {movies.map((movie, index) => {
+          const isLast = index === movies.length - 1;
+          return (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              lastMovieRef={isLast ? lastMovieRef : undefined}
+              onHover={handleHover}
+              onUnhover={handleUnhover}
+              cancelUnhover={cancelUnhover}
+            />
+          );
+        })}
       </div>
+
+      {hoveredMovie && previewPosition && movieDetails && (
+        <MoviePreviewCard
+          movie={{
+            title: hoveredMovie.title,
+            posterPath: hoveredMovie.poster_path,
+            trailerUrl: 'https://www.youtube.com/embed/hrszT45oVm4', // temporaire
+            runtime: movieDetails.runtime,
+            genres: movieDetails.genres,
+          }}
+          position={previewPosition}
+          onClose={handleUnhover}
+          onMouseEnter={cancelUnhover}
+          onMouseLeave={handleUnhover}
+          isPreviewExiting={isPreviewExiting}
+          isPreviewOpen={isPreviewOpen}
+        />
+      )}
     </div>
   );
 }
