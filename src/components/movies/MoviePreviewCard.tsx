@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import styles from '../../styles/movie.preview.card.module.scss';
+import styles from '../../styles/hover.preview.card.module.scss';
 
 type Props = {
   movie: {
