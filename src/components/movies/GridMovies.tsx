@@ -3,10 +3,11 @@
 import { useDiscoverMovies } from '@/hooks/useDiscoverMovies';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
-import { useMovieHover } from '@/hooks/useMovieHover';
+import { usePreviewHover } from '@/hooks/useMovieHover';
+import { getMovieDetails } from '@/services/movie.services';
 import { useCallback, useEffect, useState } from 'react';
 import styles from '../../styles/movie.grid.module.scss';
-import { Movie } from '../../types/movie.types';
+import { Movie, MovieDetails } from '../../types/movie.types';
 import MovieCard from './MovieCard';
 import MovieFilters from './MovieFilters';
 import MoviePreviewCard from './MoviePreviewCard';
@@ -16,15 +17,17 @@ export default function GridMovies({ active }: { active: boolean }) {
   const [page, setPage] = useState(1);
 
   const {
-    hoveredMovie,
+    hoveredItem,
     previewPosition,
-    movieDetails,
+    content,
     isPreviewExiting,
     isPreviewOpen,
     handleHover,
     handleUnhover,
     cancelUnhover,
-  } = useMovieHover();
+  } = usePreviewHover<Movie, MovieDetails>({
+    fetchData: getMovieDetails,
+  });
 
   const {
     selectedGenres,
@@ -90,14 +93,14 @@ export default function GridMovies({ active }: { active: boolean }) {
         })}
       </div>
 
-      {hoveredMovie && previewPosition && movieDetails && (
+      {hoveredItem && previewPosition && content && (
         <MoviePreviewCard
           movie={{
-            title: hoveredMovie.title,
-            posterPath: hoveredMovie.poster_path,
+            title: hoveredItem.title,
+            posterPath: hoveredItem.poster_path,
             trailerUrl: 'https://www.youtube.com/embed/hrszT45oVm4', // temporaire
-            runtime: movieDetails.runtime,
-            genres: movieDetails.genres,
+            runtime: content.runtime,
+            genres: content.genres,
           }}
           position={previewPosition}
           onClose={handleUnhover}

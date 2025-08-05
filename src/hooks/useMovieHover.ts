@@ -1,38 +1,43 @@
-import { getMovieDetails } from "@/services/movie.services";
-import { Movie, MovieDetails } from "@/types/movie.types";
 import { useRef, useCallback, useState } from "react";
 
-type PreviewState = {
-  movie: Movie | null;
+export type UsePreviewHoverOptions<Details> = {
+  delay?: number;
+  fetchData: (id: number) => Promise<Details>;
+};
+
+type PreviewState<Item> = {
+  item: Item | null;
   position: { top: number; left: number; width: number } | null;
 };
 
-export function useMovieHover() {
-  const [preview, setPreview] = useState<PreviewState>({
-    movie: null,
+export function usePreviewHover<Item extends { id: number }, Details>({
+  delay = 500,
+  fetchData,
+}: UsePreviewHoverOptions<Details>) {
+  const [preview, setPreview] = useState<PreviewState<Item>>({
+    item: null,
     position: null,
   });
 
-  const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
+  const [previewContent, setPreviewContent] = useState<Details | null>(null);
   const [isPreviewOpen, setPreviewOpen] = useState(false);
   const [isPreviewExiting, setIsPreviewExiting] = useState(false);
 
   const transitionDuration = 300;
-  const fetchDelay = 500;
 
   const currentHoverIdRef = useRef<number | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const detailsCacheRef = useRef<Map<number, MovieDetails>>(new Map());
+  const contentCacheRef = useRef<Map<number, Details>>(new Map());
 
   const handleHover = useCallback(
-    async (movie: Movie, element: HTMLElement) => {
+    async (item: Item, element: HTMLElement) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
-
+      if (!item) return;
       const rect = element.getBoundingClientRect();
 
-      currentHoverIdRef.current = movie.id;
+      currentHoverIdRef.current = item.id;
 
       // Handle exit transition before showing new preview
       if (isPreviewOpen || isPreviewExiting) {
@@ -40,13 +45,13 @@ export function useMovieHover() {
         setIsPreviewExiting(true);
 
         await new Promise((resolve) => setTimeout(resolve, transitionDuration));
-        if (currentHoverIdRef.current !== movie.id) return;
+        if (currentHoverIdRef.current !== item.id) return;
 
         setIsPreviewExiting(false);
       }
 
       setPreview({
-        movie,
+        item,
         position: {
           top: rect.top + window.scrollY - 50,
           left: rect.left + window.scrollX,
@@ -54,32 +59,32 @@ export function useMovieHover() {
         },
       });
 
-      setMovieDetails(null);
+      setPreviewContent(null);
       setPreviewOpen(false);
 
       fetchTimeoutRef.current = setTimeout(async () => {
-        const cancelGuard = () => currentHoverIdRef.current !== movie.id;
+        const cancelGuard = () => currentHoverIdRef.current !== item.id;
 
         try {
-          const cached = detailsCacheRef.current.get(movie.id);
+          const cached = contentCacheRef.current.get(item.id);
           if (cached && !cancelGuard()) {
-            setMovieDetails(cached);
+            setPreviewContent(cached);
             setPreviewOpen(true);
             return;
           }
 
-          const details = await getMovieDetails(movie.id);
+          const details = await fetchData(item.id);
           if (cancelGuard()) return;
 
-          detailsCacheRef.current.set(movie.id, details);
-          setMovieDetails(details);
+          contentCacheRef.current.set(item.id, details);
+          setPreviewContent(details);
           setPreviewOpen(true);
         } catch (e) {
           if (!cancelGuard()) {
-            console.error("Failed to fetch movie details:", e);
+            console.error("Failed to fetch content preview:", e);
           }
         }
-      }, fetchDelay);
+      }, delay);
     },
     [isPreviewOpen, isPreviewExiting]
   );
@@ -90,8 +95,8 @@ export function useMovieHover() {
 
     setTimeout(() => {
       setIsPreviewExiting(false);
-      setMovieDetails(null);
-      setPreview({ movie: null, position: null });
+      setPreviewContent(null);
+      setPreview({ item: null, position: null });
     }, transitionDuration);
   };
 
@@ -112,9 +117,9 @@ export function useMovieHover() {
   }, []);
 
   return {
-    hoveredMovie: preview.movie,
+    hoveredItem: preview.item,
     previewPosition: preview.position,
-    movieDetails,
+    content: previewContent,
     isPreviewExiting,
     isPreviewOpen,
     handleHover,
