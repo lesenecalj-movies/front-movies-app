@@ -1,6 +1,8 @@
 import { Movie, MovieDetails } from "@/types/movie.types";
 import { BaseResponse, TmdbListResponse, TmdbMovieProvidersResponse } from "@/types/tmdb.types";
 
+const tmdbUrl = process.env.NEXT_PUBLIC_TMDB_API_URL;
+
 export async function discoverMovies(
   genres: number[],
   rate: number,
@@ -8,7 +10,7 @@ export async function discoverMovies(
 ): Promise<TmdbListResponse<Movie>> {
   const genreParams = genres.length > 0 ? genres.join(",") : "";
   const res = await fetch(
-    `http://localhost:3001/movies/discover?page=${page}&genres=${genreParams}&rate=${rate}`
+    `${tmdbUrl}/movies/discover?page=${page}&genres=${genreParams}&rate=${rate}`
   );
 
   if (!res.ok) {
@@ -20,7 +22,7 @@ export async function discoverMovies(
 }
 
 export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
-  const res = await fetch(`http://localhost:3001/movies/${movieId}`);
+  const res = await fetch(`${tmdbUrl}/movies/${movieId}`);
   if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
   const { data } = await res.json() as BaseResponse<MovieDetails>;
   return data;
@@ -28,7 +30,7 @@ export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
 
 export async function getMovieProviders(movieId: number): Promise<TmdbMovieProvidersResponse> {
   const res = await fetch(
-    `http://localhost:3001/movies/${movieId}/providers`
+    `${tmdbUrl}/movies/${movieId}/providers`
   );
   if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
 
