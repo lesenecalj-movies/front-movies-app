@@ -3,7 +3,6 @@
 import { useDiscoverMovies } from '@/hooks/useDiscoverMovies';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
-import { usePreviewHover } from '@/hooks/usePreviewHover';
 import { getMovieDetails } from '@/services/movie.services';
 import { useCallback, useEffect, useState } from 'react';
 import styles from '../../styles/movie.grid.module.scss';
@@ -11,6 +10,7 @@ import { Movie, MovieDetails } from '../../types/movie.types';
 import MovieCard from './MovieCard';
 import MovieFilters from './MovieFilters';
 import MoviePreviewCard from './MoviePreviewCard';
+import { usePreviewHover } from '@/hooks/usePreviewHover';
 
 export default function GridMovies({ active }: { active: boolean }) {
   const [movies, setMovies] = useState<Movie[]>([]);

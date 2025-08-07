@@ -1,4 +1,4 @@
-import { Movie } from "@/types/movie.types";
+import { Movie, MovieDetails } from "@/types/movie.types";
 import { BaseResponse, TmdbListResponse, TmdbMovieProvidersResponse } from "@/types/tmdb.types";
 
 export async function discoverMovies(
@@ -19,10 +19,10 @@ export async function discoverMovies(
   return data;
 }
 
-export async function getMovieDetails(movieId: number): Promise<Movie> {
+export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
   const res = await fetch(`http://localhost:3001/movies/${movieId}`);
   if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-  const { data } = await res.json() as BaseResponse<Movie>;
+  const { data } = await res.json() as BaseResponse<MovieDetails>;
   return data;
 }
 

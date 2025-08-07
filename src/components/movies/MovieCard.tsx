@@ -3,7 +3,7 @@ import { getMovieDetails } from '@/services/movie.services';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import styles from '../../styles/movie.card.module.scss';
-import { Movie } from '../../types/movie.types';
+import { Movie, MovieDetails } from '../../types/movie.types';
 
 interface MovieProps {
   movie: Movie;
@@ -23,7 +23,7 @@ function MovieCard({
   cancelUnhover,
 }: MovieProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [movieDetails, setMovieDetails] = useState<Movie>();
+  const [movieDetails, setMovieDetails] = useState<MovieDetails>();
 
   const [formattedRateMovie, themeMovie] = movie.vote_average
     ? getFormattedRateAndTheme(movie.vote_average)

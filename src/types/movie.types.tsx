@@ -20,11 +20,14 @@ export type Movie = {
   vote_count: number;
 };
 
+export type MovieDetails = {
+  runtime: number;
+  genres: [{ id: number; name: string }];
+};
+
 export type MovieProvider = {
   display_priority: number;
   logo_path: string;
   provider_id: number;
   provider_name: string;
 };
-
-
