@@ -20,11 +20,6 @@ export type Movie = {
   vote_count: number;
 };
 
-export type MovieDetails = {
-  runtime: number;
-  genres: [{ id: number; name: string }];
-};
-
 export type MovieProvider = {
   display_priority: number;
   logo_path: string;
@@ -32,18 +27,4 @@ export type MovieProvider = {
   provider_name: string;
 };
 
-export interface MovieProps {
-  movie: Movie;
-  lastMovieRef?: (node: HTMLDivElement | null) => void;
-  onHover?: (movie: Movie, element: HTMLElement) => void;
-  onUnhover?: () => void;
-  cancelUnhover?: () => void;
-  hidden?: boolean;
-}
 
-export interface MovieFiltersProps {
-  genres: number[];
-  toggleGenre: (id: number) => void;
-  rate: number;
-  toggleRate: (rate: number) => void;
-}

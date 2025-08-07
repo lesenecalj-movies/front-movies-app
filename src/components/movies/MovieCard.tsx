@@ -1,17 +1,29 @@
 import { getFormattedRateAndTheme } from '@/lib/utils';
 import { getMovieDetails } from '@/services/movie.services';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../../styles/movie.card.module.scss';
-import {
-  MovieDetails,
-  MovieProps,
-} from '../../types/movie.types';
-import React from 'react';
+import { Movie } from '../../types/movie.types';
 
-function MovieCard({ movie, lastMovieRef, onHover, onUnhover, hidden, cancelUnhover }: MovieProps) {
+interface MovieProps {
+  movie: Movie;
+  lastMovieRef?: (node: HTMLDivElement | null) => void;
+  onHover?: (movie: Movie, element: HTMLElement) => void;
+  onUnhover?: () => void;
+  cancelUnhover?: () => void;
+  hidden?: boolean;
+}
+
+function MovieCard({
+  movie,
+  lastMovieRef,
+  onHover,
+  onUnhover,
+  hidden,
+  cancelUnhover,
+}: MovieProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [movieDetails, setMovieDetails] = useState<MovieDetails>();
+  const [movieDetails, setMovieDetails] = useState<Movie>();
 
   const [formattedRateMovie, themeMovie] = movie.vote_average
     ? getFormattedRateAndTheme(movie.vote_average)
@@ -57,7 +69,9 @@ function MovieCard({ movie, lastMovieRef, onHover, onUnhover, hidden, cancelUnho
 
   return (
     <div
-      className={`${styles.card} ${hidden ? styles.hiddenCard : ''}`}
+      className={`${styles.card} ${movie.id} ${
+        hidden ? styles.hiddenCard : ''
+      }`}
       ref={(el) => {
         cardRef.current = el;
         if (lastMovieRef) lastMovieRef(el);

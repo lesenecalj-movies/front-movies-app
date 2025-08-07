@@ -1,9 +1,16 @@
-import Typography from "@mui/material/Typography";
-import { Chip, styled } from "@mui/material";
-import Slider from "@mui/material/Slider";
-import { useEffect, useState } from "react";
-import styles from "../../styles/movie.filter.module.scss";
-import { MovieFiltersProps, Categorie } from "@/types/movie.types";
+import Typography from '@mui/material/Typography';
+import { Chip, styled } from '@mui/material';
+import Slider from '@mui/material/Slider';
+import { useEffect, useState } from 'react';
+import styles from '../../styles/movie.filter.module.scss';
+import { Categorie } from '@/types/movie.types';
+
+interface MovieFiltersProps {
+  genres: number[];
+  toggleGenre: (id: number) => void;
+  rate: number;
+  toggleRate: (rate: number) => void;
+}
 
 export default function MovieFilters(props: MovieFiltersProps) {
   const { genres, toggleGenre, rate, toggleRate } = props;
@@ -18,7 +25,7 @@ export default function MovieFilters(props: MovieFiltersProps) {
       const res = await fetch(`http://localhost:3001/movies/categories`);
       if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
 
-      const data = await res.json();
+      const { data } = await res.json();
 
       data.sort((a: Categorie, b: Categorie) => {
         return a.id - b.id;
@@ -26,45 +33,45 @@ export default function MovieFilters(props: MovieFiltersProps) {
 
       setCategories(data);
     } catch (error) {
-      console.error("Failed to fetch movie details:", error);
+      console.error('Failed to fetch movie details:', error);
     }
   };
 
   const PrettoSlider = styled(Slider)({
-    color: "black",
+    color: 'black',
     height: 8,
-    "& .MuiSlider-track": {
-      border: "none",
+    '& .MuiSlider-track': {
+      border: 'none',
     },
-    "& .MuiSlider-thumb": {
+    '& .MuiSlider-thumb': {
       height: 24,
       width: 24,
-      backgroundColor: "#fff",
-      border: "2px solid currentColor",
-      "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-        boxShadow: "inherit",
+      backgroundColor: '#fff',
+      border: '2px solid currentColor',
+      '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+        boxShadow: 'inherit',
       },
-      "&::before": {
-        display: "none",
+      '&::before': {
+        display: 'none',
       },
     },
-    "& .MuiSlider-valueLabel": {
+    '& .MuiSlider-valueLabel': {
       lineHeight: 1.2,
       fontSize: 12,
-      background: "unset",
+      background: 'unset',
       padding: 0,
       width: 32,
       height: 32,
-      borderRadius: "50% 50% 50% 0",
-      backgroundColor: "black",
-      transformOrigin: "bottom left",
-      transform: "translate(50%, -100%) rotate(-45deg) scale(0)",
-      "&::before": { display: "none" },
-      "&.MuiSlider-valueLabelOpen": {
-        transform: "translate(50%, -100%) rotate(-45deg) scale(1)",
+      borderRadius: '50% 50% 50% 0',
+      backgroundColor: 'black',
+      transformOrigin: 'bottom left',
+      transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
+      '&::before': { display: 'none' },
+      '&.MuiSlider-valueLabelOpen': {
+        transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
       },
-      "& > *": {
-        transform: "rotate(45deg)",
+      '& > *': {
+        transform: 'rotate(45deg)',
       },
     },
   });
@@ -90,7 +97,7 @@ export default function MovieFilters(props: MovieFiltersProps) {
             return (
               <Chip
                 key={`categorie_${index}`}
-                style={{ margin: "0.2rem" }}
+                style={{ margin: '0.2rem' }}
                 label={categorie.name}
                 onClick={() => toggleGenre(categorie.id)}
                 {...(isSelected && {

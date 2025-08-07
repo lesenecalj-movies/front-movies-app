@@ -1,5 +1,6 @@
 import { discoverMovies } from '@/services/movie.services';
-import { TmdbApiListResponse } from '@/types/tmdb.types';
+import { Movie } from '@/types/movie.types';
+import { TmdbListResponse } from '@/types/tmdb.types';
 import { useQuery } from '@tanstack/react-query';
 
 
@@ -10,7 +11,7 @@ interface UseDiscoverMoviesParams {
 }
 
 export function useDiscoverMovies({ genres, rate, page }: UseDiscoverMoviesParams) {
-  return useQuery<TmdbApiListResponse, Error, TmdbApiListResponse>({
+  return useQuery<TmdbListResponse<Movie>, Error, TmdbListResponse<Movie>>({
     queryKey: ['discoverMovies', genres.sort(), rate, page],
     queryFn: () => discoverMovies(genres, rate, page),
     keepPreviousData: true,

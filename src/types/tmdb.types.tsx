@@ -1,13 +1,22 @@
-import { Movie } from "./movie.types";
+export type BaseResponse<T> = {
+  data: T;
+  message?: string;
+  meta?: Record<string, unknown>;
+};
 
-export type TmdbApiListResponse = {
+export type TmdbResponse<T> = {
+  id: number;
+  results: T[];
+};
+
+export type TmdbListResponse<T> = {
   page: number;
-  results: Movie[];
+  results: T[];
   total_pages: number;
   total_results: number;
 };
 
-export type TmdbApiMovieProvidersResponse = {
+export type TmdbMovieProvidersResponse = {
   id: number;
   results: {
     [countryCode: string]: CountryProviderData;
