@@ -5,9 +5,16 @@ export type UsePreviewHoverOptions<Details> = {
   fetchData: (id: number) => Promise<Details>;
 };
 
+export type PreviewPosition = {
+  top: number;
+  left: number;
+  width: number;
+  origin: 'right' | 'left' | 'center';
+}
+
 type PreviewState<Item> = {
   item: Item | null;
-  position: { top: number; left: number; width: number } | null;
+  position: PreviewPosition | null;
 };
 
 export function usePreviewHover<Item extends { id: number }, Details>({
@@ -30,12 +37,45 @@ export function usePreviewHover<Item extends { id: number }, Details>({
   const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const contentCacheRef = useRef<Map<number, Details>>(new Map());
 
+  function getPreviewPosition(element: HTMLElement): PreviewPosition {
+    const rect = element.getBoundingClientRect();
+
+    const cardLeft = rect.left + window.scrollX;
+    const cardRight = rect.right + window.scrollX;
+    const cardWidth = rect.width;
+    const previewWidth = cardWidth * 1.5;
+
+    const screenLeft = window.scrollX;
+    const screenRight = window.scrollX + window.innerWidth;
+
+    let left: number;
+    let origin: 'left' | 'right' | 'center';
+
+    if (cardLeft <= screenLeft + previewWidth / 3) {
+      left = cardLeft;
+      origin = 'left';
+    }
+    else if (cardRight >= screenRight - previewWidth / 3) {
+      left = cardRight - previewWidth;
+      origin = 'right';
+    }
+    else {
+      left = cardLeft + cardWidth / 2 - previewWidth / 2;
+      origin = 'center';
+    }
+    return {
+      top: rect.top + window.scrollY - 50,
+      left,
+      width: rect.width,
+      origin,
+    };
+  }
+
   const handleHover = useCallback(
     async (item: Item, element: HTMLElement) => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
       if (!item) return;
-      const rect = element.getBoundingClientRect();
 
       currentHoverIdRef.current = item.id;
 
@@ -50,40 +90,41 @@ export function usePreviewHover<Item extends { id: number }, Details>({
         setIsPreviewExiting(false);
       }
 
+      const previewHoverPosition = getPreviewPosition(element);
+
       setPreview({
         item,
-        position: {
-          top: rect.top + window.scrollY - 50,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        },
+        position: previewHoverPosition,
       });
 
       setPreviewContent(null);
       setPreviewOpen(false);
 
-      fetchTimeoutRef.current = setTimeout(async () => {
-        const cancelGuard = () => currentHoverIdRef.current !== item.id;
+      const cancelGuard = () => currentHoverIdRef.current !== item.id;
 
-        try {
-          const cached = contentCacheRef.current.get(item.id);
-          if (cached && !cancelGuard()) {
-            setPreviewContent(cached);
-            setPreviewOpen(true);
-            return;
-          }
+      let details: Details | undefined;
 
-          const details = await fetchData(item.id);
-          if (cancelGuard()) return;
-
-          contentCacheRef.current.set(item.id, details);
-          setPreviewContent(details);
-          setPreviewOpen(true);
-        } catch (e) {
+      try {
+        const cached = contentCacheRef.current.get(item.id);
+        if (cached) {
+          details = cached;
+        } else {
+          details = await fetchData(item.id);
           if (!cancelGuard()) {
-            console.error("Failed to fetch content preview:", e);
+            contentCacheRef.current.set(item.id, details);
           }
         }
+      } catch (e) {
+        if (!cancelGuard()) {
+          console.error("Failed to fetch content preview:", e);
+        }
+        return;
+      }
+
+      fetchTimeoutRef.current = setTimeout(async () => {
+        if (cancelGuard()) return;
+        setPreviewContent(details);
+        setPreviewOpen(true);
       }, delay);
     },
     [isPreviewOpen, isPreviewExiting]
@@ -104,9 +145,7 @@ export function usePreviewHover<Item extends { id: number }, Details>({
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
 
-    timeoutRef.current = setTimeout(() => {
-      startExit();
-    }, 200); // delay before exiting
+    timeoutRef.current = setTimeout(startExit, 200); // delay before exiting
   }, []);
 
   const cancelUnhover = useCallback(() => {

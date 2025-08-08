@@ -1,16 +1,16 @@
+import { useMovieTrailer } from '@/hooks/useMovie';
+import { Movie } from '@/types/movie.types';
 import { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styles from '../../styles/hover.preview.card.module.scss';
+import { PreviewPosition } from '@/hooks/usePreviewHover';
 
 type Props = {
-  movie: {
-    title: string;
-    posterPath: string;
-    trailerUrl: string;
+  movie: Movie & {
     runtime?: number;
     genres?: { name: string }[];
   };
-  position: { top: number; left: number; width: number };
+  position: PreviewPosition;
   onClose: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
@@ -30,6 +30,12 @@ export default function MoviePreviewCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [animate, setAnimate] = useState(false);
+
+  const { data: trailer } = useMovieTrailer(movie.id);
+
+  const videoUrl = trailer
+    ? `https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=1&modestbranding=1&rel=0`
+    : null;
 
   useEffect(() => {
     setMounted(true);
@@ -61,20 +67,30 @@ export default function MoviePreviewCard({
       className={classNames.join(' ')}
       style={{
         top: position.top - position.width * -0.15,
-        left: position.left - position.width * 0.25,
+        left: position.left,
         width: position.width * 1.5,
+        transformOrigin:
+          position.origin === 'right'
+            ? 'top right'
+            : position.origin === 'left'
+            ? 'top left'
+            : 'top center',
       }}
       ref={cardRef}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       <div className={styles.videoWrapper}>
-        <iframe
-          src={`${movie.trailerUrl}?autoplay=1&mute=1`}
-          title={`${movie.title} Trailer`}
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-        />
+        {videoUrl && (
+          <iframe
+            src={videoUrl}
+            title={`${movie.title} Trailer`}
+            frameBorder="0"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowFullScreen
+            style={{ overflow: 'hidden', border: 'none' }}
+          />
+        )}
       </div>
       <div className={styles.info}>
         <h4>{movie.title}</h4>

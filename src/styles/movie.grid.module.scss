@@ -3,8 +3,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     place-items: center;
-    gap:  1.5rem 0;
+    gap: .7rem;
     height: auto;
     overflow: visible; /* Allows the card to grow outside its box */
+    padding: 1rem;
   }
 }

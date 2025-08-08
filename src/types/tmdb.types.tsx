@@ -15,24 +15,3 @@ export type TmdbListResponse<T> = {
   total_pages: number;
   total_results: number;
 };
-
-export type TmdbMovieProvidersResponse = {
-  id: number;
-  results: {
-    [countryCode: string]: CountryProviderData;
-  };
-};
-
-export type ProviderOption = {
-  display_priority: number;
-  logo_path: string;
-  provider_id: number;
-  provider_name: string;
-};
-
-export type CountryProviderData = {
-  link: string;
-  rent?: ProviderOption[];
-  buy?: ProviderOption[];
-  flatrate?: ProviderOption[];
-};
