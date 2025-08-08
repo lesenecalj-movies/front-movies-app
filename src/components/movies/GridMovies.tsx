@@ -1,6 +1,6 @@
 'use client';
 
-import { useDiscoverMovies } from '@/hooks/useDiscoverMovies';
+import { useDiscoverMovies } from '@/hooks/useMovie';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
 import { getMovieDetails } from '@/services/movie.services';
@@ -96,9 +96,7 @@ export default function GridMovies({ active }: { active: boolean }) {
       {hoveredItem && previewPosition && content && (
         <MoviePreviewCard
           movie={{
-            title: hoveredItem.title,
-            posterPath: hoveredItem.poster_path,
-            trailerUrl: 'https://www.youtube.com/embed/hrszT45oVm4', // temporaire
+            ...hoveredItem,
             runtime: content.runtime,
             genres: content.genres,
           }}

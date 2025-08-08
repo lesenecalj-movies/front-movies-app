@@ -1,12 +1,11 @@
+import { useMovieTrailer } from '@/hooks/useMovie';
+import { Movie } from '@/types/movie.types';
 import { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styles from '../../styles/hover.preview.card.module.scss';
 
 type Props = {
-  movie: {
-    title: string;
-    posterPath: string;
-    trailerUrl: string;
+  movie: Movie & {
     runtime?: number;
     genres?: { name: string }[];
   };
@@ -30,6 +29,12 @@ export default function MoviePreviewCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [animate, setAnimate] = useState(false);
+
+  const { data: trailer } = useMovieTrailer(movie.id);
+
+  const videoUrl = trailer
+    ? `https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=1&modestbranding=1&rel=0`
+    : null;
 
   useEffect(() => {
     setMounted(true);
@@ -69,12 +74,16 @@ export default function MoviePreviewCard({
       onMouseLeave={onMouseLeave}
     >
       <div className={styles.videoWrapper}>
-        <iframe
-          src={`${movie.trailerUrl}?autoplay=1&mute=1`}
-          title={`${movie.title} Trailer`}
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-        />
+        {videoUrl && (
+          <iframe
+            src={videoUrl}
+            title={`${movie.title} Trailer`}
+            frameBorder="0"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowFullScreen
+            style={{ overflow: 'hidden', border: 'none' }}
+          />
+        )}
       </div>
       <div className={styles.info}>
         <h4>{movie.title}</h4>

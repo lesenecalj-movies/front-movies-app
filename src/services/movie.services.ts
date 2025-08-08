@@ -1,4 +1,4 @@
-import { CountryProviderByCountryCode, Movie, MovieDetails } from "@/types/movie.types";
+import { CountryProviderByCountryCode, Movie, MovieDetails, TmdbVideoMovie } from "@/types/movie.types";
 import { BaseResponse, TmdbListResponse, TmdbResponse } from "@/types/tmdb.types";
 
 const tmdbUrl = process.env.NEXT_PUBLIC_TMDB_API_URL;
@@ -28,10 +28,10 @@ export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
   return data;
 }
 
-export async function getTrailerMovie(movieId: number): Promise<MovieDetails> {
-  const res = await fetch(`${tmdbUrl}/movies/${movieId}`);
+export async function getTrailerMovie(movieId: number): Promise<TmdbVideoMovie> {
+  const res = await fetch(`${tmdbUrl}/movies/${movieId}/trailer`);
   if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-  const { data } = await res.json() as BaseResponse<MovieDetails>;
+  const { data } = await res.json() as BaseResponse<TmdbVideoMovie>;
   return data;
 }
 

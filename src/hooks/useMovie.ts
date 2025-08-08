@@ -1,5 +1,5 @@
-import { discoverMovies } from '@/services/movie.services';
-import { Movie } from '@/types/movie.types';
+import { discoverMovies, getTrailerMovie } from '@/services/movie.services';
+import { Movie, TmdbVideoMovie } from '@/types/movie.types';
 import { TmdbListResponse } from '@/types/tmdb.types';
 import { useQuery } from '@tanstack/react-query';
 
@@ -17,5 +17,14 @@ export function useDiscoverMovies({ genres, rate, page }: UseDiscoverMoviesParam
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 10,
+  });
+}
+
+export function useMovieTrailer(id: number) {
+  return useQuery<TmdbVideoMovie | undefined>({
+    queryKey: ['trailer', id],
+    queryFn: () => getTrailerMovie(id),
+    staleTime: 1000 * 60 * 5,
+    enabled: !!id,
   });
 }
