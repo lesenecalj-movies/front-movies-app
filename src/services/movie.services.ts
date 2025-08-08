@@ -32,7 +32,7 @@ export async function getTrailerMovie(movieId: number): Promise<TmdbVideoMovie> 
   const res = await fetch(`${tmdbUrl}/movies/${movieId}/trailer`);
   if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
   const { data } = await res.json() as BaseResponse<TmdbVideoMovie>;
-  return data;
+  return data ?? null;
 }
 
 export async function getMovieProviders(movieId: number): Promise<TmdbResponse<CountryProviderByCountryCode>> {
