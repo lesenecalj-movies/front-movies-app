@@ -3,13 +3,14 @@ import { Movie } from '@/types/movie.types';
 import { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styles from '../../styles/hover.preview.card.module.scss';
+import { PreviewPosition } from '@/hooks/usePreviewHover';
 
 type Props = {
   movie: Movie & {
     runtime?: number;
     genres?: { name: string }[];
   };
-  position: { top: number; left: number; width: number };
+  position: PreviewPosition;
   onClose: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
@@ -66,8 +67,14 @@ export default function MoviePreviewCard({
       className={classNames.join(' ')}
       style={{
         top: position.top - position.width * -0.15,
-        left: position.left - position.width * 0.25,
+        left: position.left,
         width: position.width * 1.5,
+        transformOrigin:
+          position.origin === 'right'
+            ? 'top right'
+            : position.origin === 'left'
+            ? 'top left'
+            : 'top center',
       }}
       ref={cardRef}
       onMouseEnter={onMouseEnter}

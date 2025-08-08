@@ -10,7 +10,6 @@
   // Animation
   opacity: 0;
   transform: translateY(-20px) scale(1.2);
-  transform-origin: top center;
   transition: opacity 300ms ease, transform 300ms ease;
   will-change: transform, opacity;
 
