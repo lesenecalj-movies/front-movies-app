@@ -1,11 +1,14 @@
 .container_grid {
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    place-items: center;
-    gap: .7rem;
-    height: auto;
-    overflow: visible; /* Allows the card to grow outside its box */
+    grid-template-columns: repeat(auto-fill, minmax(199px, 1fr));
+    gap: 0.7rem;
     padding: 1rem;
+
+    justify-items: stretch;
+    align-items: start;
+
+    //Allows the card to grow outside its box
+    overflow: visible;
   }
 }
