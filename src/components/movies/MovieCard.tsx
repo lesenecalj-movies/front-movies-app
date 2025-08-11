@@ -1,9 +1,9 @@
+import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { getFormattedRateAndTheme } from '@/lib/utils';
 import { getMovieDetails } from '@/services/movie.services';
-import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
-import styles from '../../styles/movie.card.module.scss';
 import { Movie, MovieDetails } from '../../types/movie.types';
+import styles from '../../styles/movie.card.module.scss';
 
 interface MovieProps {
   movie: Movie;
