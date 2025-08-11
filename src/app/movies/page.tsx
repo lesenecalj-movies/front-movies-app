@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import GridMovies from '../../components/movies/GridMovies';
 import styles from '../../styles/movies.module.scss';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Movies() {
   const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
 
   const [viewMode, setViewMode] = useState<'search' | 'grid' | 'categories'>(
     'grid',
@@ -22,7 +24,9 @@ export default function Movies() {
     <div className={styles.container}>
       <header className={styles.container_movies_title}>
         <h1>Movies 🎬</h1>
-        <button onClick={openLogin}>Se connecter</button>
+
+        {isAuthenticated && <>{user?.email}</>}
+        {!isAuthenticated && <button onClick={openLogin}>Log in</button>}
       </header>
 
       <main className={styles.container_movies_display}>

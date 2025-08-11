@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { signIn } from "@root/auth";
+import { auth, signIn } from "@root/auth";
 
 const schema = z.object({
   email: z.email(),
@@ -24,4 +24,12 @@ export async function login(input: unknown) {
     console.error({ err });
     return { ok: false, error: "Identifiants invalides." };
   }
+}
+
+export async function isLogged() {
+  const session = await auth();
+  if (!session?.user) {
+    return false;
+  }
+  return true;
 }
