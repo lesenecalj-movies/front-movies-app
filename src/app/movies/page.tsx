@@ -15,8 +15,7 @@ export default function Movies() {
   );
 
   const openLogin = () => {
-    const cb = encodeURIComponent('/dashboard');
-    router.push(`/auth/login?callbackUrl=${cb}`);
+    router.push('/auth/login');
   };
 
   return (

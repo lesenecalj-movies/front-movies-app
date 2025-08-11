@@ -1,8 +1,8 @@
 import "server-only";
-import NextAuth, { type NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-const config: NextAuthOptions = {
+const config: NextAuthConfig = {
   session: { strategy: "jwt" },
   providers: [
     Credentials({
