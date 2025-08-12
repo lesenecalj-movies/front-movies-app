@@ -1,1 +1,3 @@
-export { handlers as GET, handlers as POST } from "@root/auth";
+import { handlers } from '@root/auth';
+
+export const { GET, POST } = handlers;

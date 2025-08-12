@@ -1,4 +1,4 @@
-import { auth } from "@root/auth";
+import { auth, signOut } from "@root/auth";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -7,7 +7,7 @@ export async function GET() {
 }
 
 export async function POST() {
+  await signOut({ redirect: false });
   const res = NextResponse.json({ success: true });
-  res.cookies.set("session", "", { maxAge: 0 });
   return res;
 }

@@ -1,5 +1,6 @@
 'use client';
 import { Session } from 'next-auth';
+import { useRouter } from 'next/navigation';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 export type UserLite = { email?: string | null };
@@ -19,12 +20,14 @@ export function AuthProvider({
   children: React.ReactNode;
   initialSession: Session | null;
 }) {
+  const router = useRouter();
   const [user, setUser] = useState<UserLite | null>(
     initialSession?.user ?? null,
   );
 
   const logout = async () => {
-    await fetch('/api/logout', { method: 'POST' });
+    await fetch('/api/session', { method: 'POST' });
+    router.refresh();
     setUser(null);
   };
 
