@@ -7,6 +7,7 @@ type AuthCtx = {
   user: UserLite | null;
   isAuthenticated: boolean;
   setUser: (u: UserLite | null) => void;
+  logout: () => void;
 };
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -21,8 +22,14 @@ export function AuthProvider({
   const [user, setUser] = useState<UserLite | null>(
     initialSession?.user ?? null,
   );
+
+  const logout = async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    setUser(null);
+  };
+
   const value = useMemo(
-    () => ({ user, isAuthenticated: !!user, setUser }),
+    () => ({ user, isAuthenticated: !!user, setUser, logout }),
     [user],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
