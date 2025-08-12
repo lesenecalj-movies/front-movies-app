@@ -1,6 +1,7 @@
 'use client';
 
 import { login } from '@/app/actions/auth';
+import { useAuth } from '@/context/AuthContext';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -13,6 +14,7 @@ export default function LoginModal() {
   const [errorMessage, setErrorMessage] = useState('');
   const { register, handleSubmit, formState } = useForm<FormData>();
   const [pending, startTransition] = useTransition();
+  const { setUser } = useAuth();
 
   const onClose = () => {
     if (history.length > 1) router.back();
@@ -23,6 +25,10 @@ export default function LoginModal() {
     startTransition(async () => {
       const res = await login(data);
       if (res.ok) {
+        const { user } = await fetch('/api/session', {
+          cache: 'no-store',
+        }).then((r) => r.json());
+        setUser(user);
         router.refresh();
         onClose();
       } else {

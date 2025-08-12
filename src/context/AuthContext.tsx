@@ -1,5 +1,6 @@
 'use client';
 import { Session } from 'next-auth';
+import { useRouter } from 'next/navigation';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 export type UserLite = { email?: string | null };
@@ -7,6 +8,7 @@ type AuthCtx = {
   user: UserLite | null;
   isAuthenticated: boolean;
   setUser: (u: UserLite | null) => void;
+  logout: () => void;
 };
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -18,11 +20,19 @@ export function AuthProvider({
   children: React.ReactNode;
   initialSession: Session | null;
 }) {
+  const router = useRouter();
   const [user, setUser] = useState<UserLite | null>(
     initialSession?.user ?? null,
   );
+
+  const logout = async () => {
+    await fetch('/api/session', { method: 'POST' });
+    router.refresh();
+    setUser(null);
+  };
+
   const value = useMemo(
-    () => ({ user, isAuthenticated: !!user, setUser }),
+    () => ({ user, isAuthenticated: !!user, setUser, logout }),
     [user],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

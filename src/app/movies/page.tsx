@@ -7,6 +7,7 @@ import { useState } from 'react';
 import GridMovies from '../../components/movies/GridMovies';
 import styles from '../../styles/movies.module.scss';
 import { useAuth } from '@/context/AuthContext';
+import UserMenu from '@/components/users/UserMenu';
 
 export default function Movies() {
   const router = useRouter();
@@ -22,11 +23,17 @@ export default function Movies() {
 
   return (
     <div className={styles.container}>
-      <header className={styles.container_movies_title}>
-        <h1>Movies 🎬</h1>
-
-        {isAuthenticated && <>{user?.email}</>}
-        {!isAuthenticated && <button onClick={openLogin}>Log in</button>}
+      <header className={styles.container_movies_header}>
+        <div className={styles.container_movies_title}>
+          <h1>Movies 🎬</h1>
+        </div>
+        <div className={styles.container_movies_user}>
+          {isAuthenticated ? (
+            <UserMenu email={user?.email as string} />
+          ) : (
+            <button onClick={openLogin}>Log in</button>
+          )}
+        </div>
       </header>
 
       <main className={styles.container_movies_display}>
